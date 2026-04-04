@@ -15,6 +15,8 @@ import java.util.stream.*;
  * 6. 计算PageRank
  * 7. 随机游走
  */
+
+// diff
 public class Main {
 
     // 图的邻接表表示: word -> {neighbor -> weight}
