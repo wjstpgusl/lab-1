@@ -17,6 +17,8 @@ import java.util.stream.*;
  */
 
 // diff
+
+// B2
 public class Main {
 
     // 图的邻接表表示: word -> {neighbor -> weight}
