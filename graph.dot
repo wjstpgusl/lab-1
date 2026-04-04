@@ -1,0 +1,36 @@
+digraph WordGraph {
+  layout=neato;
+  overlap=false;
+  splines=true;
+  sep="+5";
+  node [shape=circle, style=filled, fillcolor="#FFB6C1",
+        fontsize=11, fontname="Arial", width=0.6, fixedsize=false];
+  edge [fontsize=9, fontname="Arial", color="#2E8B57",
+        fontcolor="#333333", arrowsize=0.7];
+  "the" -> "scientist" [label="2", penwidth=1.8];
+  "the" -> "data" [label="1", penwidth=1.0];
+  "the" -> "report" [label="1", penwidth=1.0];
+  "the" -> "team" [label="2", penwidth=1.8];
+  "scientist" -> "carefully" [label="1", penwidth=1.0];
+  "scientist" -> "analyzed" [label="1", penwidth=1.0];
+  "carefully" -> "analyzed" [label="1", penwidth=1.0];
+  "analyzed" -> "the" [label="1", penwidth=1.0];
+  "analyzed" -> "it" [label="1", penwidth=1.0];
+  "data" -> "wrote" [label="1", penwidth=1.0];
+  "data" -> "so" [label="1", penwidth=1.0];
+  "wrote" -> "a" [label="1", penwidth=1.0];
+  "a" -> "detailed" [label="1", penwidth=1.0];
+  "detailed" -> "report" [label="1", penwidth=1.0];
+  "report" -> "and" [label="1", penwidth=1.0];
+  "report" -> "with" [label="1", penwidth=1.0];
+  "and" -> "shared" [label="1", penwidth=1.0];
+  "shared" -> "the" [label="1", penwidth=1.0];
+  "with" -> "the" [label="1", penwidth=1.0];
+  "team" -> "but" [label="1", penwidth=1.0];
+  "team" -> "requested" [label="1", penwidth=1.0];
+  "but" -> "the" [label="1", penwidth=1.0];
+  "requested" -> "more" [label="1", penwidth=1.0];
+  "more" -> "data" [label="1", penwidth=1.0];
+  "so" -> "the" [label="1", penwidth=1.0];
+  "it" -> "again" [label="1", penwidth=1.0];
+}
