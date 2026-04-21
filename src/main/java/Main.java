@@ -1,6 +1,6 @@
 import java.io.*;
 import java.util.*;
-import java.util.stream.*;
+
 
 /**
  * Lab1: 基于大模型的编程与Git实战
@@ -27,6 +27,7 @@ public class Main {
     private static Map<String, Map<String, Integer>> graph = new LinkedHashMap<>();
     private static Random random = new Random();
     private static boolean enableGraphImage = true;
+
     // ==================== 主程序 ====================
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -718,4 +719,7 @@ public class Main {
 
     public static boolean isWalkFinished() { return walkFinished; }
     public static String getWalkStopReason() { return walkStopReason; }
+    public static void setGraphForTest(Map<String, Map<String, Integer>> testGraph) {
+    graph = testGraph;
+    }
 }
