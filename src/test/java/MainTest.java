@@ -84,4 +84,42 @@ public class MainTest {
         String result = Main.queryBridgeWords("SEEK", "WORLDS");
         assertEquals("The bridge words from \"SEEK\" to \"WORLDS\" is: \"new\".", result);
     }
+    // ========== 백박스 테스트: calcShortestPath ==========
+
+    // P1: src, dst 둘 다 그래프에 없음
+    @Test
+    public void testShortestPath_bothNotExist() {
+        String result = Main.calcShortestPath("apple", "banana");
+        assertEquals("No \"apple\" and \"banana\" in the graph!", result);
+    }
+
+    // P2: src만 그래프에 없음
+    @Test
+    public void testShortestPath_srcNotExist() {
+        String result = Main.calcShortestPath("apple", "new");
+        assertEquals("No \"apple\" in the graph!", result);
+    }
+
+    // P3: dst만 그래프에 없음
+    @Test
+    public void testShortestPath_dstNotExist() {
+        String result = Main.calcShortestPath("to", "banana");
+        assertEquals("No \"banana\" in the graph!", result);
+    }
+
+    // P4: 둘 다 있지만 경로 없음
+    @Test
+    public void testShortestPath_noPath() {
+        String result = Main.calcShortestPath("strange", "worlds");
+        assertEquals("No path from \"strange\" to \"worlds\"!", result);
+    }
+
+    // P5: 정상 경로 존재
+    @Test
+    public void testShortestPath_normalPath() {
+        String result = Main.calcShortestPath("to", "worlds");
+        assertTrue(result.startsWith("Shortest path:"));
+        assertTrue(result.contains("worlds"));
+        assertTrue(result.contains("length"));
+    }
 }
