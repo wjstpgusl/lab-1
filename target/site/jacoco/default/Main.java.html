@@ -1,12 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wordgraph</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">import java.io.*;
-import java.util.*;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wordgraph</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.Set;
 
 
 /**
  * Lab1: 基于大模型的编程与Git实战
  * 有向词图（Directed Word Graph）程序
- * 
- * 功能：
+ *
+ * &lt;p&gt;功能：
  * 1. 读入文本文件生成有向图
  * 2. 展示有向图
  * 3. 查询桥接词
@@ -21,189 +35,193 @@ import java.util.*;
 // B2
 
 //commit
-<span class="nc" id="L24">public class Main {</span>
+<span class="nc" id="L38">public class Main {</span>
 
     // 图的邻接表表示: word -&gt; {neighbor -&gt; weight}
-<span class="fc" id="L27">    private static Map&lt;String, Map&lt;String, Integer&gt;&gt; graph = new LinkedHashMap&lt;&gt;();</span>
-<span class="fc" id="L28">    private static Random random = new Random();</span>
-<span class="fc" id="L29">    private static boolean enableGraphImage = true;</span>
+<span class="fc" id="L41">    private static Map&lt;String, Map&lt;String, Integer&gt;&gt; graph = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L42">    private static Random random = new Random();</span>
+<span class="fc" id="L43">    static boolean enableGraphImage = true;</span>
 
-    // ==================== 主程序 ====================
+    /**
+     * 程序入口：读取文件路径，构建词图，进入功能菜单循环。
+     *
+     * @param args 命令行参数，args[0]可指定文本文件路径
+     */
     public static void main(String[] args) {
-<span class="nc" id="L33">        Scanner scanner = new Scanner(System.in);</span>
+<span class="nc" id="L51">        try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8.name())) {</span>
         String filePath;
 
-<span class="nc bnc" id="L36" title="All 2 branches missed.">        if (args.length &gt; 0) {</span>
-<span class="nc" id="L37">            filePath = args[0];</span>
-        } else {
-<span class="nc" id="L39">            System.out.print(&quot;请输入文本文件路径: &quot;);</span>
-<span class="nc" id="L40">            filePath = scanner.nextLine().trim();</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (args.length &gt; 0) {</span>
+<span class="nc" id="L55">            filePath = args[0];</span>
+<span class="nc" id="L56">        } else {</span>
+<span class="nc" id="L57">            System.out.print(&quot;请输入文本文件路径: &quot;);</span>
+<span class="nc" id="L58">            filePath = scanner.nextLine().trim();</span>
         }
 
         // 读入文件并构建图
-<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (!buildGraph(filePath)) {</span>
-<span class="nc" id="L45">            System.out.println(&quot;文件读取失败，程序退出。&quot;);</span>
-<span class="nc" id="L46">            return;</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (!buildGraph(filePath)) {</span>
+<span class="nc" id="L63">            System.out.println(&quot;文件读取失败，程序退出。&quot;);</span>
+<span class="nc" id="L64">            return;</span>
         }
-<span class="nc" id="L48">        System.out.println(&quot;图构建成功！节点数: &quot; + graph.size());</span>
+<span class="nc" id="L66">        System.out.println(&quot;图构建成功！节点数: &quot; + graph.size());</span>
 
         // 主菜单循环
-        while (true) {
-<span class="nc" id="L52">            System.out.println(&quot;\n========== 功能菜单 ==========&quot;);</span>
-<span class="nc" id="L53">            System.out.println(&quot;1. 展示有向图&quot;);</span>
-<span class="nc" id="L54">            System.out.println(&quot;2. 查询桥接词&quot;);</span>
-<span class="nc" id="L55">            System.out.println(&quot;3. 生成新文本&quot;);</span>
-<span class="nc" id="L56">            System.out.println(&quot;4. 计算最短路径&quot;);</span>
-<span class="nc" id="L57">            System.out.println(&quot;5. 计算PageRank&quot;);</span>
-<span class="nc" id="L58">            System.out.println(&quot;6. 随机游走&quot;);</span>
-<span class="nc" id="L59">            System.out.println(&quot;0. 退出&quot;);</span>
-<span class="nc" id="L60">            System.out.print(&quot;请选择功能: &quot;);</span>
+<span class="nc" id="L69">        while (true) {</span>
+<span class="nc" id="L70">            System.out.println(&quot;\n========== 功能菜单 ==========&quot;);</span>
+<span class="nc" id="L71">            System.out.println(&quot;1. 展示有向图&quot;);</span>
+<span class="nc" id="L72">            System.out.println(&quot;2. 查询桥接词&quot;);</span>
+<span class="nc" id="L73">            System.out.println(&quot;3. 生成新文本&quot;);</span>
+<span class="nc" id="L74">            System.out.println(&quot;4. 计算最短路径&quot;);</span>
+<span class="nc" id="L75">            System.out.println(&quot;5. 计算PageRank&quot;);</span>
+<span class="nc" id="L76">            System.out.println(&quot;6. 随机游走&quot;);</span>
+<span class="nc" id="L77">            System.out.println(&quot;0. 退出&quot;);</span>
+<span class="nc" id="L78">            System.out.print(&quot;请选择功能: &quot;);</span>
 
-<span class="nc" id="L62">            String choice = scanner.nextLine().trim();</span>
-<span class="nc bnc" id="L63" title="All 8 branches missed.">            switch (choice) {</span>
+<span class="nc" id="L80">            String choice = scanner.nextLine().trim();</span>
+<span class="nc bnc" id="L81" title="All 8 branches missed.">            switch (choice) {</span>
                 case &quot;1&quot;:
-<span class="nc" id="L65">                    showDirectedGraph(graph);</span>
-<span class="nc" id="L66">                    break;</span>
+<span class="nc" id="L83">                    showDirectedGraph(graph);</span>
+<span class="nc" id="L84">                    break;</span>
                 case &quot;2&quot;:
-<span class="nc" id="L68">                    System.out.print(&quot;输入word1: &quot;);</span>
-<span class="nc" id="L69">                    String w1 = scanner.nextLine().trim();</span>
-<span class="nc" id="L70">                    System.out.print(&quot;输入word2: &quot;);</span>
-<span class="nc" id="L71">                    String w2 = scanner.nextLine().trim();</span>
-<span class="nc" id="L72">                    System.out.println(queryBridgeWords(w1, w2));</span>
-<span class="nc" id="L73">                    break;</span>
+<span class="nc" id="L86">                    System.out.print(&quot;输入word1: &quot;);</span>
+<span class="nc" id="L87">                    String w1 = scanner.nextLine().trim();</span>
+<span class="nc" id="L88">                    System.out.print(&quot;输入word2: &quot;);</span>
+<span class="nc" id="L89">                    String w2 = scanner.nextLine().trim();</span>
+<span class="nc" id="L90">                    System.out.println(queryBridgeWords(w1, w2));</span>
+<span class="nc" id="L91">                    break;</span>
                 case &quot;3&quot;:
-<span class="nc" id="L75">                    System.out.print(&quot;输入新文本: &quot;);</span>
-<span class="nc" id="L76">                    String inputText = scanner.nextLine().trim();</span>
-<span class="nc" id="L77">                    System.out.println(&quot;生成结果: &quot; + generateNewText(inputText));</span>
-<span class="nc" id="L78">                    break;</span>
+<span class="nc" id="L93">                    System.out.print(&quot;输入新文本: &quot;);</span>
+<span class="nc" id="L94">                    String inputText = scanner.nextLine().trim();</span>
+<span class="nc" id="L95">                    System.out.println(&quot;生成结果: &quot; + generateNewText(inputText));</span>
+<span class="nc" id="L96">                    break;</span>
                 case &quot;4&quot;:
-<span class="nc" id="L80">                    System.out.print(&quot;输入word1: &quot;);</span>
-<span class="nc" id="L81">                    String sw1 = scanner.nextLine().trim();</span>
-<span class="nc" id="L82">                    System.out.print(&quot;输入word2 (可留空，计算到所有词的最短路径): &quot;);</span>
-<span class="nc" id="L83">                    String sw2 = scanner.nextLine().trim();</span>
-<span class="nc bnc" id="L84" title="All 2 branches missed.">                    if (sw2.isEmpty()) {</span>
-<span class="nc" id="L85">                        String src = sw1.toLowerCase();</span>
-<span class="nc bnc" id="L86" title="All 2 branches missed.">                        if (!graph.containsKey(src)) {</span>
-<span class="nc" id="L87">                            System.out.println(&quot;No \&quot;&quot; + sw1 + &quot;\&quot; in the graph!&quot;);</span>
-                        } else {
-<span class="nc" id="L89">                            enableGraphImage = false;</span>
-<span class="nc bnc" id="L90" title="All 2 branches missed.">                            for (String target : graph.keySet()) {</span>
-<span class="nc bnc" id="L91" title="All 2 branches missed.">                                if (!target.equals(src)) {</span>
-<span class="nc" id="L92">                                    System.out.println(calcShortestPath(sw1, target));</span>
+<span class="nc" id="L98">                    System.out.print(&quot;输入word1: &quot;);</span>
+<span class="nc" id="L99">                    String sw1 = scanner.nextLine().trim();</span>
+<span class="nc" id="L100">                    System.out.print(&quot;输入word2 (可留空，计算到所有词的最短路径): &quot;);</span>
+<span class="nc" id="L101">                    String sw2 = scanner.nextLine().trim();</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">                    if (sw2.isEmpty()) {</span>
+<span class="nc" id="L103">                        String src = sw1.toLowerCase();</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">                        if (!graph.containsKey(src)) {</span>
+<span class="nc" id="L105">                            System.out.println(&quot;No \&quot;&quot; + sw1 + &quot;\&quot; in the graph!&quot;);</span>
+<span class="nc" id="L106">                        } else {</span>
+<span class="nc" id="L107">                            enableGraphImage = false;</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">                            for (String target : graph.keySet()) {</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">                                if (!target.equals(src)) {</span>
+<span class="nc" id="L110">                                    System.out.println(calcShortestPath(sw1, target));</span>
                                 }
-<span class="nc" id="L94">                            }</span>
-<span class="nc" id="L95">                            enableGraphImage = true;</span>
+                            }
+<span class="nc" id="L113">                            enableGraphImage = true;</span>
                         }
-<span class="nc" id="L97">                    } else {</span>
-<span class="nc" id="L98">                        System.out.println(calcShortestPath(sw1, sw2));</span>
+<span class="nc" id="L115">                    } else {</span>
+<span class="nc" id="L116">                        System.out.println(calcShortestPath(sw1, sw2));</span>
                     }
-<span class="nc" id="L100">                    break;</span>
+<span class="nc" id="L118">                    break;</span>
                 case &quot;5&quot;:
-<span class="nc" id="L102">                    System.out.print(&quot;输入单词 (输入all计算所有节点): &quot;);</span>
-<span class="nc" id="L103">                    String prWord = scanner.nextLine().trim();</span>
-<span class="nc bnc" id="L104" title="All 2 branches missed.">                    if (prWord.equalsIgnoreCase(&quot;all&quot;)) {</span>
+<span class="nc" id="L120">                    System.out.print(&quot;输入单词 (输入all计算所有节点): &quot;);</span>
+<span class="nc" id="L121">                    String prWord = scanner.nextLine().trim();</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">                    if (prWord.equalsIgnoreCase(&quot;all&quot;)) {</span>
                         // 计算所有节点的PR值并排序输出
-<span class="nc" id="L106">                        Map&lt;String, Double&gt; allPR = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L107" title="All 2 branches missed.">                        for (String node : graph.keySet()) {</span>
-<span class="nc" id="L108">                            allPR.put(node, calPageRank(node));</span>
-<span class="nc" id="L109">                        }</span>
-<span class="nc" id="L110">                        allPR.entrySet().stream()</span>
-<span class="nc" id="L111">                            .sorted((a, b) -&gt; Double.compare(b.getValue(), a.getValue()))</span>
-<span class="nc" id="L112">                            .forEach(e -&gt; System.out.printf(&quot;  %-20s PR = %.6f%n&quot;, e.getKey(), e.getValue()));</span>
-<span class="nc" id="L113">                    } else {</span>
-<span class="nc" id="L114">                        Double pr = calPageRank(prWord);</span>
-<span class="nc bnc" id="L115" title="All 2 branches missed.">                        if (pr != null) {</span>
-<span class="nc" id="L116">                            System.out.printf(&quot;PageRank(\&quot;%s\&quot;) = %.6f%n&quot;, prWord.toLowerCase(), pr);</span>
-                        } else {
-<span class="nc" id="L118">                            System.out.println(&quot;No \&quot;&quot; + prWord + &quot;\&quot; in the graph!&quot;);</span>
+<span class="nc" id="L124">                        Map&lt;String, Double&gt; allPR = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L125" title="All 2 branches missed.">                        for (String node : graph.keySet()) {</span>
+<span class="nc" id="L126">                            allPR.put(node, calPageRank(node));</span>
+                        }
+<span class="nc" id="L128">                        allPR.entrySet().stream()</span>
+<span class="nc" id="L129">                            .sorted((a, b) -&gt; Double.compare(b.getValue(), a.getValue()))</span>
+<span class="nc" id="L130">                            .forEach(e -&gt; System.out.printf(&quot;  %-20s PR = %.6f%n&quot;, e.getKey(), e.getValue()));</span>
+<span class="nc" id="L131">                    } else {</span>
+<span class="nc" id="L132">                        Double pr = calPageRank(prWord);</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">                        if (pr != null) {</span>
+<span class="nc" id="L134">                            System.out.printf(&quot;PageRank(\&quot;%s\&quot;) = %.6f%n&quot;, prWord.toLowerCase(), pr);</span>
+<span class="nc" id="L135">                        } else {</span>
+<span class="nc" id="L136">                            System.out.println(&quot;No \&quot;&quot; + prWord + &quot;\&quot; in the graph!&quot;);</span>
                         }
                     }
-<span class="nc" id="L121">                    break;</span>
+<span class="nc" id="L139">                    break;</span>
                 case &quot;6&quot;:
-<span class="nc" id="L123">                    System.out.println(&quot;随机游走开始 (按Enter继续, 输入q停止):&quot;);</span>
-<span class="nc" id="L124">                    String startNode = Main.randomWalkInit();</span>
-<span class="nc bnc" id="L125" title="All 2 branches missed.">                    if (startNode == null) {</span>
-<span class="nc" id="L126">                        System.out.println(&quot;图为空, 无法游走。&quot;);</span>
-                    } else {
-<span class="nc" id="L128">                        System.out.print(startNode);</span>
-<span class="nc bnc" id="L129" title="All 2 branches missed.">                        while (!Main.isWalkFinished()) {</span>
-<span class="nc" id="L130">                            System.out.print(&quot;  [Enter继续/q停止]: &quot;);</span>
-<span class="nc" id="L131">                            String cmd = scanner.nextLine().trim();</span>
-<span class="nc bnc" id="L132" title="All 2 branches missed.">                            if (cmd.equalsIgnoreCase(&quot;q&quot;)) {</span>
-<span class="nc" id="L133">                                System.out.println(&quot;(用户停止游走)&quot;);</span>
-<span class="nc" id="L134">                                break;</span>
+<span class="nc" id="L141">                    System.out.println(&quot;随机游走开始 (按Enter继续, 输入q停止):&quot;);</span>
+<span class="nc" id="L142">                    String startNode = Main.randomWalkInit();</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">                    if (startNode == null) {</span>
+<span class="nc" id="L144">                        System.out.println(&quot;图为空, 无法游走。&quot;);</span>
+<span class="nc" id="L145">                    } else {</span>
+<span class="nc" id="L146">                        System.out.print(startNode);</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">                        while (!Main.isWalkFinished()) {</span>
+<span class="nc" id="L148">                            System.out.print(&quot;  [Enter继续/q停止]: &quot;);</span>
+<span class="nc" id="L149">                            String cmd = scanner.nextLine().trim();</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">                            if (cmd.equalsIgnoreCase(&quot;q&quot;)) {</span>
+<span class="nc" id="L151">                                System.out.println(&quot;(用户停止游走)&quot;);</span>
+<span class="nc" id="L152">                                break;</span>
                             }
-<span class="nc" id="L136">                            String nextNode = Main.randomWalkStep();</span>
-<span class="nc bnc" id="L137" title="All 2 branches missed.">                            if (nextNode != null) {</span>
-<span class="nc" id="L138">                                System.out.print(&quot; &quot; + nextNode);</span>
+<span class="nc" id="L154">                            String nextNode = Main.randomWalkStep();</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">                            if (nextNode != null) {</span>
+<span class="nc" id="L156">                                System.out.print(&quot; &quot; + nextNode);</span>
                             }
-<span class="nc bnc" id="L140" title="All 2 branches missed.">                            if (Main.isWalkFinished()) {</span>
-<span class="nc" id="L141">                                System.out.println(&quot;\n(&quot; + Main.getWalkStopReason() + &quot;)&quot;);</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">                            if (Main.isWalkFinished()) {</span>
+<span class="nc" id="L159">                                System.out.println(&quot;\n(&quot; + Main.getWalkStopReason() + &quot;)&quot;);</span>
                             }
-<span class="nc" id="L143">                        }</span>
-<span class="nc" id="L144">                        String walkResult = Main.randomWalk();</span>
-<span class="nc" id="L145">                        System.out.println(&quot;游走结果: &quot; + walkResult);</span>
-<span class="nc" id="L146">                        System.out.println(&quot;结果已保存到 random_walk.txt&quot;);</span>
+                        }
+<span class="nc" id="L162">                        String walkResult = Main.randomWalk();</span>
+<span class="nc" id="L163">                        System.out.println(&quot;游走结果: &quot; + walkResult);</span>
+<span class="nc" id="L164">                        System.out.println(&quot;结果已保存到 random_walk.txt&quot;);</span>
                     }
-<span class="nc" id="L148">                    break;</span>
+<span class="nc" id="L166">                    break;</span>
                 case &quot;0&quot;:
-<span class="nc" id="L150">                    System.out.println(&quot;程序退出。&quot;);</span>
-<span class="nc" id="L151">                    scanner.close();</span>
-<span class="nc" id="L152">                    return;</span>
+<span class="nc" id="L168">                    System.out.println(&quot;程序退出。&quot;);</span>
+<span class="nc" id="L169">                    return;</span>
                 default:
-<span class="nc" id="L154">                    System.out.println(&quot;无效选择，请重新输入。&quot;);</span>
+<span class="nc" id="L171">                    System.out.println(&quot;无效选择，请重新输入。&quot;);</span>
             }
-<span class="nc" id="L156">        }</span>
+        }
+        } // end try-with-resources (scanner)
     }
 
     // ==================== 构建图 ====================
     private static boolean buildGraph(String filePath) {
         try {
-<span class="nc" id="L162">            StringBuilder sb = new StringBuilder();</span>
-<span class="nc" id="L163">            BufferedReader reader = new BufferedReader(new FileReader(filePath));</span>
+<span class="nc" id="L180">            StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L181">            BufferedReader reader = new BufferedReader(new InputStreamReader(new java.io.FileInputStream(filePath), StandardCharsets.UTF_8));</span>
             String line;
-<span class="nc bnc" id="L165" title="All 2 branches missed.">            while ((line = reader.readLine()) != null) {</span>
-<span class="nc" id="L166">                sb.append(line).append(&quot; &quot;);</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">            while ((line = reader.readLine()) != null) {</span>
+<span class="nc" id="L184">                sb.append(line).append(&quot; &quot;);</span>
             }
-<span class="nc" id="L168">            reader.close();</span>
+<span class="nc" id="L186">            reader.close();</span>
 
             // 处理文本：替换非字母为空格，转小写
-<span class="nc" id="L171">            String text = sb.toString().toLowerCase();</span>
-<span class="nc" id="L172">            StringBuilder cleaned = new StringBuilder();</span>
-<span class="nc bnc" id="L173" title="All 2 branches missed.">            for (char c : text.toCharArray()) {</span>
-<span class="nc bnc" id="L174" title="All 4 branches missed.">                if (c &gt;= 'a' &amp;&amp; c &lt;= 'z') {</span>
-<span class="nc" id="L175">                    cleaned.append(c);</span>
-                } else {
-<span class="nc" id="L177">                    cleaned.append(' ');</span>
+<span class="nc" id="L189">            String text = sb.toString().toLowerCase();</span>
+<span class="nc" id="L190">            StringBuilder cleaned = new StringBuilder();</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">            for (char c : text.toCharArray()) {</span>
+<span class="nc bnc" id="L192" title="All 4 branches missed.">                if (c &gt;= 'a' &amp;&amp; c &lt;= 'z') {</span>
+<span class="nc" id="L193">                    cleaned.append(c);</span>
+<span class="nc" id="L194">                } else {</span>
+<span class="nc" id="L195">                    cleaned.append(' ');</span>
                 }
             }
 
             // 分词
-<span class="nc" id="L182">            String[] words = cleaned.toString().trim().split(&quot;\\s+&quot;);</span>
-<span class="nc bnc" id="L183" title="All 6 branches missed.">            if (words.length == 0 || (words.length == 1 &amp;&amp; words[0].isEmpty())) {</span>
-<span class="nc" id="L184">                System.out.println(&quot;文本为空！&quot;);</span>
-<span class="nc" id="L185">                return false;</span>
+<span class="nc" id="L200">            String[] words = cleaned.toString().trim().split(&quot;\\s+&quot;);</span>
+<span class="nc bnc" id="L201" title="All 6 branches missed.">            if (words.length == 0 || (words.length == 1 &amp;&amp; words[0].isEmpty())) {</span>
+<span class="nc" id="L202">                System.out.println(&quot;文本为空！&quot;);</span>
+<span class="nc" id="L203">                return false;</span>
             }
 
             // 构建有向图
-<span class="nc" id="L189">            graph.clear();</span>
-<span class="nc bnc" id="L190" title="All 2 branches missed.">            for (String w : words) {</span>
-<span class="nc bnc" id="L191" title="All 2 branches missed.">                if (!w.isEmpty()) {</span>
-<span class="nc" id="L192">                    graph.putIfAbsent(w, new LinkedHashMap&lt;&gt;());</span>
+<span class="nc" id="L207">            graph.clear();</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">            for (String w : words) {</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">                if (!w.isEmpty()) {</span>
+<span class="nc" id="L210">                    graph.putIfAbsent(w, new LinkedHashMap&lt;&gt;());</span>
                 }
             }
 
-<span class="nc bnc" id="L196" title="All 2 branches missed.">            for (int i = 0; i &lt; words.length - 1; i++) {</span>
-<span class="nc bnc" id="L197" title="All 4 branches missed.">                if (words[i].isEmpty() || words[i + 1].isEmpty()) continue;</span>
-<span class="nc" id="L198">                String from = words[i];</span>
-<span class="nc" id="L199">                String to = words[i + 1];</span>
-<span class="nc" id="L200">                graph.get(from).merge(to, 1, Integer::sum);</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">            for (int i = 0; i &lt; words.length - 1; i++) {</span>
+<span class="nc bnc" id="L215" title="All 4 branches missed.">                if (words[i].isEmpty() || words[i + 1].isEmpty()) continue;</span>
+<span class="nc" id="L216">                String from = words[i];</span>
+<span class="nc" id="L217">                String to = words[i + 1];</span>
+<span class="nc" id="L218">                graph.get(from).merge(to, 1, Integer::sum);</span>
             }
 
-<span class="nc" id="L203">            return true;</span>
-<span class="nc" id="L204">        } catch (IOException e) {</span>
-<span class="nc" id="L205">            System.out.println(&quot;读取文件出错: &quot; + e.getMessage());</span>
-<span class="nc" id="L206">            return false;</span>
+<span class="nc" id="L221">            return true;</span>
+<span class="nc" id="L222">        } catch (IOException e) {</span>
+<span class="nc" id="L223">            System.out.println(&quot;读取文件出错: &quot; + e.getMessage());</span>
+<span class="nc" id="L224">            return false;</span>
         }
     }
 
@@ -213,61 +231,61 @@ import java.util.*;
      */
     public static void showDirectedGraph(Map&lt;String, Map&lt;String, Integer&gt;&gt; G) {
         // CLI展示部分 - 构建展示字符串
-<span class="nc" id="L216">        StringBuilder display = new StringBuilder();</span>
-<span class="nc" id="L217">        display.append(&quot;\n===== 有向图 =====\n&quot;);</span>
-<span class="nc bnc" id="L218" title="All 2 branches missed.">        for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : G.entrySet()) {</span>
-<span class="nc" id="L219">            String from = entry.getKey();</span>
-<span class="nc" id="L220">            Map&lt;String, Integer&gt; edges = entry.getValue();</span>
-<span class="nc bnc" id="L221" title="All 2 branches missed.">            for (Map.Entry&lt;String, Integer&gt; edge : edges.entrySet()) {</span>
-<span class="nc" id="L222">                display.append(String.format(&quot;  %s -&gt; %s [weight=%d]%n&quot;, from, edge.getKey(), edge.getValue()));</span>
-<span class="nc" id="L223">            }</span>
-<span class="nc" id="L224">        }</span>
-<span class="nc" id="L225">        display.append(&quot;  无出边的节点: &quot;);</span>
-<span class="nc" id="L226">        List&lt;String&gt; sinks = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L227" title="All 2 branches missed.">        for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : G.entrySet()) {</span>
-<span class="nc bnc" id="L228" title="All 2 branches missed.">            if (entry.getValue().isEmpty()) sinks.add(entry.getKey());</span>
-<span class="nc" id="L229">        }</span>
-<span class="nc bnc" id="L230" title="All 2 branches missed.">        display.append(sinks.isEmpty() ? &quot;(无)&quot; : String.join(&quot;, &quot;, sinks));</span>
-<span class="nc" id="L231">        System.out.println(display);</span>
+<span class="nc" id="L234">        StringBuilder display = new StringBuilder();</span>
+<span class="nc" id="L235">        display.append(&quot;\n===== 有向图 =====\n&quot;);</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">        for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : G.entrySet()) {</span>
+<span class="nc" id="L237">            String from = entry.getKey();</span>
+<span class="nc" id="L238">            Map&lt;String, Integer&gt; edges = entry.getValue();</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">            for (Map.Entry&lt;String, Integer&gt; edge : edges.entrySet()) {</span>
+<span class="nc" id="L240">                display.append(String.format(&quot;  %s -&gt; %s [weight=%d]%n&quot;, from, edge.getKey(), edge.getValue()));</span>
+            }
+        }
+<span class="nc" id="L243">        display.append(&quot;  无出边的节点: &quot;);</span>
+<span class="nc" id="L244">        List&lt;String&gt; sinks = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : G.entrySet()) {</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">            if (entry.getValue().isEmpty()) sinks.add(entry.getKey());</span>
+        }
+<span class="nc bnc" id="L248" title="All 2 branches missed.">        display.append(sinks.isEmpty() ? &quot;(无)&quot; : String.join(&quot;, &quot;, sinks));</span>
+<span class="nc" id="L249">        System.out.println(display);</span>
 
         // 生成Graphviz DOT文件（网络图样式）
         try {
-<span class="nc" id="L235">            StringBuilder dot = new StringBuilder();</span>
-<span class="nc" id="L236">            dot.append(&quot;digraph WordGraph {\n&quot;);</span>
-<span class="nc" id="L237">            dot.append(&quot;  layout=neato;\n&quot;);</span>
-<span class="nc" id="L238">            dot.append(&quot;  overlap=false;\n&quot;);</span>
-<span class="nc" id="L239">            dot.append(&quot;  splines=true;\n&quot;);</span>
-<span class="nc" id="L240">            dot.append(&quot;  sep=\&quot;+5\&quot;;\n&quot;);</span>
-<span class="nc" id="L241">            dot.append(&quot;  node [shape=circle, style=filled, fillcolor=\&quot;#FFB6C1\&quot;,\n&quot;);</span>
-<span class="nc" id="L242">            dot.append(&quot;        fontsize=11, fontname=\&quot;Arial\&quot;, width=0.6, fixedsize=false];\n&quot;);</span>
-<span class="nc" id="L243">            dot.append(&quot;  edge [fontsize=9, fontname=\&quot;Arial\&quot;, color=\&quot;#2E8B57\&quot;,\n&quot;);</span>
-<span class="nc" id="L244">            dot.append(&quot;        fontcolor=\&quot;#333333\&quot;, arrowsize=0.7];\n&quot;);</span>
-<span class="nc bnc" id="L245" title="All 2 branches missed.">            for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : G.entrySet()) {</span>
-<span class="nc" id="L246">                String from = entry.getKey();</span>
-<span class="nc bnc" id="L247" title="All 2 branches missed.">                for (Map.Entry&lt;String, Integer&gt; edge : entry.getValue().entrySet()) {</span>
-<span class="nc" id="L248">                    int w = edge.getValue();</span>
+<span class="nc" id="L253">            StringBuilder dot = new StringBuilder();</span>
+<span class="nc" id="L254">            dot.append(&quot;digraph WordGraph {\n&quot;);</span>
+<span class="nc" id="L255">            dot.append(&quot;  layout=neato;\n&quot;);</span>
+<span class="nc" id="L256">            dot.append(&quot;  overlap=false;\n&quot;);</span>
+<span class="nc" id="L257">            dot.append(&quot;  splines=true;\n&quot;);</span>
+<span class="nc" id="L258">            dot.append(&quot;  sep=\&quot;+5\&quot;;\n&quot;);</span>
+<span class="nc" id="L259">            dot.append(&quot;  node [shape=circle, style=filled, fillcolor=\&quot;#FFB6C1\&quot;,\n&quot;);</span>
+<span class="nc" id="L260">            dot.append(&quot;        fontsize=11, fontname=\&quot;Arial\&quot;, width=0.6, fixedsize=false];\n&quot;);</span>
+<span class="nc" id="L261">            dot.append(&quot;  edge [fontsize=9, fontname=\&quot;Arial\&quot;, color=\&quot;#2E8B57\&quot;,\n&quot;);</span>
+<span class="nc" id="L262">            dot.append(&quot;        fontcolor=\&quot;#333333\&quot;, arrowsize=0.7];\n&quot;);</span>
+<span class="nc bnc" id="L263" title="All 2 branches missed.">            for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : G.entrySet()) {</span>
+<span class="nc" id="L264">                String from = entry.getKey();</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">                for (Map.Entry&lt;String, Integer&gt; edge : entry.getValue().entrySet()) {</span>
+<span class="nc" id="L266">                    int w = edge.getValue();</span>
                     // 边越粗表示权重越大
-<span class="nc" id="L250">                    double penwidth = 1.0 + (w - 1) * 0.8;</span>
-<span class="nc" id="L251">                    dot.append(String.format(&quot;  \&quot;%s\&quot; -&gt; \&quot;%s\&quot; [label=\&quot;%d\&quot;, penwidth=%.1f];\n&quot;,</span>
-<span class="nc" id="L252">                        from, edge.getKey(), w, penwidth));</span>
-<span class="nc" id="L253">                }</span>
-<span class="nc" id="L254">            }</span>
-<span class="nc" id="L255">            dot.append(&quot;}\n&quot;);</span>
+<span class="nc" id="L268">                    double penwidth = 1.0 + (w - 1) * 0.8;</span>
+<span class="nc" id="L269">                    dot.append(String.format(&quot;  \&quot;%s\&quot; -&gt; \&quot;%s\&quot; [label=\&quot;%d\&quot;, penwidth=%.1f];\n&quot;,</span>
+<span class="nc" id="L270">                        from, edge.getKey(), w, penwidth));</span>
+                }
+            }
+<span class="nc" id="L273">            dot.append(&quot;}\n&quot;);</span>
 
             // 写DOT文件
-<span class="nc" id="L258">            String dotFile = &quot;graph.dot&quot;;</span>
-<span class="nc" id="L259">            String pngFile = &quot;graph.png&quot;;</span>
-<span class="nc" id="L260">            BufferedWriter writer = new BufferedWriter(new FileWriter(dotFile));</span>
-<span class="nc" id="L261">            writer.write(dot.toString());</span>
-<span class="nc" id="L262">            writer.close();</span>
-<span class="nc" id="L263">            System.out.println(&quot;DOT文件已保存为 &quot; + dotFile);</span>
+<span class="nc" id="L276">            String dotFile = &quot;graph.dot&quot;;</span>
+<span class="nc" id="L277">            String pngFile = &quot;graph.png&quot;;</span>
+<span class="nc" id="L278">            BufferedWriter writer = new BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(dotFile), StandardCharsets.UTF_8));</span>
+<span class="nc" id="L279">            writer.write(dot.toString());</span>
+<span class="nc" id="L280">            writer.close();</span>
+<span class="nc" id="L281">            System.out.println(&quot;DOT文件已保存为 &quot; + dotFile);</span>
 
             // 调用Graphviz生成PNG（如果已安装）
-<span class="nc" id="L266">            runDot(dotFile, pngFile);</span>
-<span class="nc" id="L267">        } catch (Exception e) {</span>
-<span class="nc" id="L268">            System.out.println(&quot;生成图形文件时出错: &quot; + e.getMessage());</span>
-<span class="nc" id="L269">        }</span>
-<span class="nc" id="L270">    }</span>
+<span class="nc" id="L284">            runDot(dotFile, pngFile);</span>
+<span class="nc" id="L285">        } catch (Exception e) {</span>
+<span class="nc" id="L286">            System.out.println(&quot;生成图形文件时出错: &quot; + e.getMessage());</span>
+        }
+<span class="nc" id="L288">    }</span>
 
     /**
      * 调用Graphviz命令生成PNG图片
@@ -276,39 +294,43 @@ import java.util.*;
      */
     private static void runDot(String dotFile, String pngFile) {
         // 检测DOT文件中指定的layout引擎
-<span class="fc" id="L279">        String engine = &quot;dot&quot;;</span>
-<span class="fc" id="L280">        try (BufferedReader check = new BufferedReader(new FileReader(dotFile))) {</span>
+<span class="fc" id="L297">        String engine = &quot;dot&quot;;</span>
+<span class="fc" id="L298">        try (BufferedReader check = new BufferedReader(new InputStreamReader(new java.io.FileInputStream(dotFile), StandardCharsets.UTF_8))) {</span>
             String line;
-<span class="pc bpc" id="L282" title="1 of 2 branches missed.">            while ((line = check.readLine()) != null) {</span>
-<span class="fc bfc" id="L283" title="All 2 branches covered.">                if (line.contains(&quot;layout=neato&quot;)) { engine = &quot;neato&quot;; break; }</span>
-<span class="pc bpc" id="L284" title="1 of 2 branches missed.">                if (line.contains(&quot;layout=fdp&quot;)) { engine = &quot;fdp&quot;; break; }</span>
-<span class="pc bpc" id="L285" title="1 of 2 branches missed.">                if (line.contains(&quot;layout=sfdp&quot;)) { engine = &quot;sfdp&quot;; break; }</span>
-<span class="pc bpc" id="L286" title="1 of 2 branches missed.">                if (line.contains(&quot;layout=circo&quot;)) { engine = &quot;circo&quot;; break; }</span>
+<span class="pc bpc" id="L300" title="1 of 2 branches missed.">            while ((line = check.readLine()) != null) {</span>
+<span class="fc bfc" id="L301" title="All 2 branches covered.">                if (line.contains(&quot;layout=neato&quot;)) { engine = &quot;neato&quot;; break; }</span>
+<span class="pc bpc" id="L302" title="1 of 2 branches missed.">                if (line.contains(&quot;layout=fdp&quot;)) { engine = &quot;fdp&quot;; break; }</span>
+<span class="pc bpc" id="L303" title="1 of 2 branches missed.">                if (line.contains(&quot;layout=sfdp&quot;)) { engine = &quot;sfdp&quot;; break; }</span>
+<span class="pc bpc" id="L304" title="1 of 2 branches missed.">                if (line.contains(&quot;layout=circo&quot;)) { engine = &quot;circo&quot;; break; }</span>
             }
-<span class="pc" id="L288">        } catch (IOException ignored) {}</span>
+<span class="nc" id="L306">        } catch (IOException ignored) {}</span>
 
         try {
-<span class="fc" id="L291">            ProcessBuilder pb = new ProcessBuilder(engine, &quot;-Tpng&quot;, dotFile, &quot;-o&quot;, pngFile);</span>
-<span class="fc" id="L292">            pb.redirectErrorStream(true);</span>
-<span class="fc" id="L293">            Process p = pb.start();</span>
-<span class="fc" id="L294">            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {</span>
-<span class="pc bpc" id="L295" title="1 of 2 branches missed.">                while (br.readLine() != null) { /* consume */ }</span>
+<span class="fc" id="L309">            ProcessBuilder pb = new ProcessBuilder(engine, &quot;-Tpng&quot;, dotFile, &quot;-o&quot;, pngFile);</span>
+<span class="fc" id="L310">            pb.redirectErrorStream(true);</span>
+<span class="fc" id="L311">            Process p = pb.start();</span>
+<span class="fc" id="L312">            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8))) {</span>
+                String outputLine;
+<span class="pc bpc" id="L314" title="1 of 2 branches missed.">                while ((outputLine = br.readLine()) != null) {</span>
+                    // consume process output
+<span class="nc bnc" id="L316" title="All 2 branches missed.">                    assert outputLine != null;</span>
+                }
             }
-<span class="fc" id="L297">            int exitCode = p.waitFor();</span>
-<span class="pc bpc" id="L298" title="1 of 2 branches missed.">            if (exitCode == 0) {</span>
-<span class="fc" id="L299">                System.out.println(&quot;图片已保存为 &quot; + pngFile);</span>
-            } else {
-<span class="nc" id="L301">                System.out.println(&quot;Graphviz生成图片失败(exit=&quot; + exitCode + &quot;)，DOT文件可用其他工具打开。&quot;);</span>
+<span class="fc" id="L319">            int exitCode = p.waitFor();</span>
+<span class="pc bpc" id="L320" title="1 of 2 branches missed.">            if (exitCode == 0) {</span>
+<span class="fc" id="L321">                System.out.println(&quot;图片已保存为 &quot; + pngFile);</span>
+<span class="fc" id="L322">            } else {</span>
+<span class="nc" id="L323">                System.out.println(&quot;Graphviz生成图片失败(exit=&quot; + exitCode + &quot;)，DOT文件可用其他工具打开。&quot;);</span>
             }
-<span class="nc" id="L303">        } catch (IOException e) {</span>
-<span class="nc" id="L304">            System.out.println(&quot;[提示] Graphviz未安装，无法自动生成PNG图片。&quot;);</span>
-<span class="nc" id="L305">            System.out.println(&quot;  请安装Graphviz: https://graphviz.org/download/&quot;);</span>
-<span class="nc" id="L306">            System.out.println(&quot;  安装后可手动执行: &quot; + engine + &quot; -Tpng &quot; + dotFile + &quot; -o &quot; + pngFile);</span>
-<span class="nc" id="L307">            System.out.println(&quot;  或将DOT文件内容粘贴到在线工具: https://dreampuf.github.io/GraphvizOnline/&quot;);</span>
-<span class="nc" id="L308">        } catch (InterruptedException e) {</span>
-<span class="nc" id="L309">            Thread.currentThread().interrupt();</span>
-<span class="pc" id="L310">        }</span>
-<span class="fc" id="L311">    }</span>
+<span class="nc" id="L325">        } catch (IOException e) {</span>
+<span class="nc" id="L326">            System.out.println(&quot;[提示] Graphviz未安装，无法自动生成PNG图片。&quot;);</span>
+<span class="nc" id="L327">            System.out.println(&quot;  请安装Graphviz: https://graphviz.org/download/&quot;);</span>
+<span class="nc" id="L328">            System.out.println(&quot;  安装后可手动执行: &quot; + engine + &quot; -Tpng &quot; + dotFile + &quot; -o &quot; + pngFile);</span>
+<span class="nc" id="L329">            System.out.println(&quot;  或将DOT文件内容粘贴到在线工具: https://dreampuf.github.io/GraphvizOnline/&quot;);</span>
+<span class="nc" id="L330">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L331">            Thread.currentThread().interrupt();</span>
+        }
+<span class="fc" id="L333">    }</span>
 
     // ==================== 功能2：查询桥接词 ====================
     /**
@@ -316,53 +338,52 @@ import java.util.*;
      * 桥接词word3: 存在 word1-&gt;word3 和 word3-&gt;word2 的边
      */
     public static String queryBridgeWords(String word1, String word2) {
-<span class="fc" id="L319">        String w1 = word1.toLowerCase();</span>
-<span class="fc" id="L320">        String w2 = word2.toLowerCase();</span>
+<span class="fc" id="L341">        String w1 = word1.toLowerCase();</span>
+<span class="fc" id="L342">        String w2 = word2.toLowerCase();</span>
 
-<span class="fc" id="L322">        boolean w1Exists = graph.containsKey(w1);</span>
-<span class="fc" id="L323">        boolean w2Exists = graph.containsKey(w2);</span>
+<span class="fc" id="L344">        boolean w1Exists = graph.containsKey(w1);</span>
+<span class="fc" id="L345">        boolean w2Exists = graph.containsKey(w2);</span>
 
-<span class="fc bfc" id="L325" title="All 4 branches covered.">        if (!w1Exists &amp;&amp; !w2Exists) {</span>
-<span class="fc" id="L326">            return &quot;No \&quot;&quot; + word1 + &quot;\&quot; and \&quot;&quot; + word2 + &quot;\&quot; in the graph!&quot;;</span>
+<span class="fc bfc" id="L347" title="All 4 branches covered.">        if (!w1Exists &amp;&amp; !w2Exists) {</span>
+<span class="fc" id="L348">            return &quot;No \&quot;&quot; + word1 + &quot;\&quot; and \&quot;&quot; + word2 + &quot;\&quot; in the graph!&quot;;</span>
         }
-<span class="fc bfc" id="L328" title="All 2 branches covered.">        if (!w1Exists) {</span>
-<span class="fc" id="L329">            return &quot;No \&quot;&quot; + word1 + &quot;\&quot; in the graph!&quot;;</span>
+<span class="fc bfc" id="L350" title="All 2 branches covered.">        if (!w1Exists) {</span>
+<span class="fc" id="L351">            return &quot;No \&quot;&quot; + word1 + &quot;\&quot; in the graph!&quot;;</span>
         }
-<span class="fc bfc" id="L331" title="All 2 branches covered.">        if (!w2Exists) {</span>
-<span class="fc" id="L332">            return &quot;No \&quot;&quot; + word2 + &quot;\&quot; in the graph!&quot;;</span>
+<span class="fc bfc" id="L353" title="All 2 branches covered.">        if (!w2Exists) {</span>
+<span class="fc" id="L354">            return &quot;No \&quot;&quot; + word2 + &quot;\&quot; in the graph!&quot;;</span>
         }
 
         // 查找桥接词
-<span class="fc" id="L336">        List&lt;String&gt; bridgeWords = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L337">        Map&lt;String, Integer&gt; w1Neighbors = graph.get(w1);</span>
-<span class="pc bpc" id="L338" title="1 of 2 branches missed.">        if (w1Neighbors != null) {</span>
-<span class="fc bfc" id="L339" title="All 2 branches covered.">            for (String mid : w1Neighbors.keySet()) {</span>
-<span class="fc" id="L340">                Map&lt;String, Integer&gt; midNeighbors = graph.get(mid);</span>
-<span class="pc bpc" id="L341" title="1 of 4 branches missed.">                if (midNeighbors != null &amp;&amp; midNeighbors.containsKey(w2)) {</span>
-<span class="fc" id="L342">                    bridgeWords.add(mid);</span>
-                }
-<span class="fc" id="L344">            }</span>
+<span class="fc" id="L358">        List&lt;String&gt; bridgeWords = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L359">        Map&lt;String, Integer&gt; w1Neighbors = graph.getOrDefault(w1, Collections.emptyMap());</span>
+<span class="fc bfc" id="L360" title="All 2 branches covered.">        for (String mid : w1Neighbors.keySet()) {</span>
+            // midNeighbors는 getOrDefault로 안전하게 처리
+<span class="fc" id="L362">            Map&lt;String, Integer&gt; midNeighbors = graph.getOrDefault(mid, Collections.emptyMap());</span>
+<span class="fc bfc" id="L363" title="All 2 branches covered.">            if (midNeighbors.containsKey(w2)) {</span>
+<span class="fc" id="L364">                bridgeWords.add(mid);</span>
+            }
         }
 
-<span class="fc bfc" id="L347" title="All 2 branches covered.">        if (bridgeWords.isEmpty()) {</span>
-<span class="fc" id="L348">            return &quot;No bridge words from \&quot;&quot; + word1 + &quot;\&quot; to \&quot;&quot; + word2 + &quot;\&quot;!&quot;;</span>
+<span class="fc bfc" id="L368" title="All 2 branches covered.">        if (bridgeWords.isEmpty()) {</span>
+<span class="fc" id="L369">            return &quot;No bridge words from \&quot;&quot; + word1 + &quot;\&quot; to \&quot;&quot; + word2 + &quot;\&quot;!&quot;;</span>
         }
 
-<span class="fc bfc" id="L351" title="All 2 branches covered.">        if (bridgeWords.size() == 1) {</span>
-<span class="fc" id="L352">            return &quot;The bridge words from \&quot;&quot; + word1 + &quot;\&quot; to \&quot;&quot; + word2 + &quot;\&quot; is: \&quot;&quot; + bridgeWords.get(0) + &quot;\&quot;.&quot;;</span>
+<span class="fc bfc" id="L372" title="All 2 branches covered.">        if (bridgeWords.size() == 1) {</span>
+<span class="fc" id="L373">            return &quot;The bridge words from \&quot;&quot; + word1 + &quot;\&quot; to \&quot;&quot; + word2 + &quot;\&quot; is: \&quot;&quot; + bridgeWords.get(0) + &quot;\&quot;.&quot;;</span>
         }
 
         // 多个桥接词
-<span class="fc" id="L356">        StringBuilder sb = new StringBuilder();</span>
-<span class="fc" id="L357">        sb.append(&quot;The bridge words from \&quot;&quot;).append(word1).append(&quot;\&quot; to \&quot;&quot;).append(word2).append(&quot;\&quot; are: &quot;);</span>
-<span class="fc bfc" id="L358" title="All 2 branches covered.">        for (int i = 0; i &lt; bridgeWords.size(); i++) {</span>
-<span class="fc bfc" id="L359" title="All 2 branches covered.">            if (i == bridgeWords.size() - 1) {</span>
-<span class="fc" id="L360">                sb.append(&quot;and \&quot;&quot;).append(bridgeWords.get(i)).append(&quot;\&quot;.&quot;);</span>
-            } else {
-<span class="fc" id="L362">                sb.append(&quot;\&quot;&quot;).append(bridgeWords.get(i)).append(&quot;\&quot;, &quot;);</span>
+<span class="fc" id="L377">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L378">        sb.append(&quot;The bridge words from \&quot;&quot;).append(word1).append(&quot;\&quot; to \&quot;&quot;).append(word2).append(&quot;\&quot; are: &quot;);</span>
+<span class="fc bfc" id="L379" title="All 2 branches covered.">        for (int i = 0; i &lt; bridgeWords.size(); i++) {</span>
+<span class="fc bfc" id="L380" title="All 2 branches covered.">            if (i == bridgeWords.size() - 1) {</span>
+<span class="fc" id="L381">                sb.append(&quot;and \&quot;&quot;).append(bridgeWords.get(i)).append(&quot;\&quot;.&quot;);</span>
+<span class="fc" id="L382">            } else {</span>
+<span class="fc" id="L383">                sb.append(&quot;\&quot;&quot;).append(bridgeWords.get(i)).append(&quot;\&quot;, &quot;);</span>
             }
         }
-<span class="fc" id="L365">        return sb.toString();</span>
+<span class="fc" id="L386">        return sb.toString();</span>
     }
 
     // ==================== 功能3：根据桥接词生成新文本 ====================
@@ -371,49 +392,49 @@ import java.util.*;
      */
     public static String generateNewText(String inputText) {
         // 提取单词（保留原始大小写用于输出）
-<span class="nc" id="L374">        String[] words = inputText.split(&quot;\\s+&quot;);</span>
-<span class="nc bnc" id="L375" title="All 2 branches missed.">        if (words.length &lt;= 1) {</span>
-<span class="nc" id="L376">            return inputText;</span>
+<span class="nc" id="L395">        String[] words = inputText.split(&quot;\\s+&quot;);</span>
+<span class="nc bnc" id="L396" title="All 2 branches missed.">        if (words.length &lt;= 1) {</span>
+<span class="nc" id="L397">            return inputText;</span>
         }
 
-<span class="nc" id="L379">        StringBuilder result = new StringBuilder();</span>
-<span class="nc" id="L380">        result.append(words[0]);</span>
+<span class="nc" id="L400">        StringBuilder result = new StringBuilder();</span>
+<span class="nc" id="L401">        result.append(words[0]);</span>
 
-<span class="nc bnc" id="L382" title="All 2 branches missed.">        for (int i = 0; i &lt; words.length - 1; i++) {</span>
-<span class="nc" id="L383">            String w1 = words[i].toLowerCase().replaceAll(&quot;[^a-z]&quot;, &quot;&quot;);</span>
-<span class="nc" id="L384">            String w2 = words[i + 1].toLowerCase().replaceAll(&quot;[^a-z]&quot;, &quot;&quot;);</span>
+<span class="nc bnc" id="L403" title="All 2 branches missed.">        for (int i = 0; i &lt; words.length - 1; i++) {</span>
+<span class="nc" id="L404">            String w1 = words[i].toLowerCase().replaceAll(&quot;[^a-z]&quot;, &quot;&quot;);</span>
+<span class="nc" id="L405">            String w2 = words[i + 1].toLowerCase().replaceAll(&quot;[^a-z]&quot;, &quot;&quot;);</span>
 
             // 查找桥接词
-<span class="nc" id="L387">            List&lt;String&gt; bridges = getBridgeWordsList(w1, w2);</span>
-<span class="nc bnc" id="L388" title="All 2 branches missed.">            if (!bridges.isEmpty()) {</span>
+<span class="nc" id="L408">            List&lt;String&gt; bridges = getBridgeWordsList(w1, w2);</span>
+<span class="nc bnc" id="L409" title="All 2 branches missed.">            if (!bridges.isEmpty()) {</span>
                 // 随机选一个
-<span class="nc" id="L390">                String bridge = bridges.get(random.nextInt(bridges.size()));</span>
-<span class="nc" id="L391">                result.append(&quot; &quot;).append(bridge);</span>
+<span class="nc" id="L411">                String bridge = bridges.get(random.nextInt(bridges.size()));</span>
+<span class="nc" id="L412">                result.append(&quot; &quot;).append(bridge);</span>
             }
-<span class="nc" id="L393">            result.append(&quot; &quot;).append(words[i + 1]);</span>
+<span class="nc" id="L414">            result.append(&quot; &quot;).append(words[i + 1]);</span>
         }
 
-<span class="nc" id="L396">        return result.toString();</span>
+<span class="nc" id="L417">        return result.toString();</span>
     }
 
     /**
      * 获取桥接词列表（辅助函数）
      */
     private static List&lt;String&gt; getBridgeWordsList(String w1, String w2) {
-<span class="nc" id="L403">        List&lt;String&gt; bridgeWords = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L404" title="All 4 branches missed.">        if (!graph.containsKey(w1) || !graph.containsKey(w2)) {</span>
-<span class="nc" id="L405">            return bridgeWords;</span>
+<span class="nc" id="L424">        List&lt;String&gt; bridgeWords = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L425" title="All 4 branches missed.">        if (!graph.containsKey(w1) || !graph.containsKey(w2)) {</span>
+<span class="nc" id="L426">            return bridgeWords;</span>
         }
-<span class="nc" id="L407">        Map&lt;String, Integer&gt; w1Neighbors = graph.get(w1);</span>
-<span class="nc bnc" id="L408" title="All 2 branches missed.">        if (w1Neighbors != null) {</span>
-<span class="nc bnc" id="L409" title="All 2 branches missed.">            for (String mid : w1Neighbors.keySet()) {</span>
-<span class="nc" id="L410">                Map&lt;String, Integer&gt; midNeighbors = graph.get(mid);</span>
-<span class="nc bnc" id="L411" title="All 4 branches missed.">                if (midNeighbors != null &amp;&amp; midNeighbors.containsKey(w2)) {</span>
-<span class="nc" id="L412">                    bridgeWords.add(mid);</span>
+<span class="nc" id="L428">        Map&lt;String, Integer&gt; w1Neighbors = graph.get(w1);</span>
+<span class="nc bnc" id="L429" title="All 2 branches missed.">        if (w1Neighbors != null) {</span>
+<span class="nc bnc" id="L430" title="All 2 branches missed.">            for (String mid : w1Neighbors.keySet()) {</span>
+<span class="nc" id="L431">                Map&lt;String, Integer&gt; midNeighbors = graph.get(mid);</span>
+<span class="nc bnc" id="L432" title="All 4 branches missed.">                if (midNeighbors != null &amp;&amp; midNeighbors.containsKey(w2)) {</span>
+<span class="nc" id="L433">                    bridgeWords.add(mid);</span>
                 }
-<span class="nc" id="L414">            }</span>
+            }
         }
-<span class="nc" id="L416">        return bridgeWords;</span>
+<span class="nc" id="L437">        return bridgeWords;</span>
     }
 
     // ==================== 功能4：最短路径（Dijkstra） ====================
@@ -422,77 +443,136 @@ import java.util.*;
      * 返回路径描述和长度
      */
     public static String calcShortestPath(String word1, String word2) {
-<span class="fc" id="L425">        String src = word1.toLowerCase();</span>
-<span class="fc" id="L426">        String dst = word2.toLowerCase();</span>
+<span class="fc" id="L446">        String src = word1.toLowerCase();</span>
+<span class="fc" id="L447">        String dst = word2.toLowerCase();</span>
 
-<span class="fc bfc" id="L428" title="All 4 branches covered.">        if (!graph.containsKey(src) &amp;&amp; !graph.containsKey(dst)) {</span>
-<span class="fc" id="L429">            return &quot;No \&quot;&quot; + word1 + &quot;\&quot; and \&quot;&quot; + word2 + &quot;\&quot; in the graph!&quot;;</span>
+<span class="fc bfc" id="L449" title="All 4 branches covered.">        if (!graph.containsKey(src) &amp;&amp; !graph.containsKey(dst)) {</span>
+<span class="fc" id="L450">            return &quot;No \&quot;&quot; + word1 + &quot;\&quot; and \&quot;&quot; + word2 + &quot;\&quot; in the graph!&quot;;</span>
         }
-<span class="fc bfc" id="L431" title="All 2 branches covered.">        if (!graph.containsKey(src)) {</span>
-<span class="fc" id="L432">            return &quot;No \&quot;&quot; + word1 + &quot;\&quot; in the graph!&quot;;</span>
+<span class="fc bfc" id="L452" title="All 2 branches covered.">        if (!graph.containsKey(src)) {</span>
+<span class="fc" id="L453">            return &quot;No \&quot;&quot; + word1 + &quot;\&quot; in the graph!&quot;;</span>
         }
-<span class="fc bfc" id="L434" title="All 2 branches covered.">        if (!graph.containsKey(dst)) {</span>
-<span class="fc" id="L435">            return &quot;No \&quot;&quot; + word2 + &quot;\&quot; in the graph!&quot;;</span>
+<span class="fc bfc" id="L455" title="All 2 branches covered.">        if (!graph.containsKey(dst)) {</span>
+<span class="fc" id="L456">            return &quot;No \&quot;&quot; + word2 + &quot;\&quot; in the graph!&quot;;</span>
         }
 
         // Dijkstra
-<span class="fc" id="L439">        Map&lt;String, Integer&gt; dist = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L440">        Map&lt;String, String&gt; prev = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L441">        Set&lt;String&gt; visited = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L442">        PriorityQueue&lt;String[]&gt; pq = new PriorityQueue&lt;&gt;((a, b) -&gt; </span>
-<span class="fc" id="L443">            Integer.parseInt(a[1]) - Integer.parseInt(b[1]));</span>
+<span class="fc" id="L460">        Map&lt;String, Integer&gt; dist = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L461">        Map&lt;String, String&gt; prev = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L462">        Set&lt;String&gt; visited = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L463">        PriorityQueue&lt;String[]&gt; pq = new PriorityQueue&lt;&gt;((a, b) -&gt; </span>
+<span class="fc" id="L464">            Integer.parseInt(a[1]) - Integer.parseInt(b[1]));</span>
 
-<span class="fc bfc" id="L445" title="All 2 branches covered.">        for (String node : graph.keySet()) {</span>
-<span class="fc" id="L446">            dist.put(node, Integer.MAX_VALUE);</span>
-<span class="fc" id="L447">        }</span>
-<span class="fc" id="L448">        dist.put(src, 0);</span>
-<span class="fc" id="L449">        pq.offer(new String[]{src, &quot;0&quot;});</span>
+<span class="fc bfc" id="L466" title="All 2 branches covered.">        for (String node : graph.keySet()) {</span>
+<span class="fc" id="L467">            dist.put(node, Integer.MAX_VALUE);</span>
+        }
+<span class="fc" id="L469">        dist.put(src, 0);</span>
+<span class="fc" id="L470">        pq.offer(new String[]{src, &quot;0&quot;});</span>
 
-<span class="fc bfc" id="L451" title="All 2 branches covered.">        while (!pq.isEmpty()) {</span>
-<span class="fc" id="L452">            String[] curr = pq.poll();</span>
-<span class="fc" id="L453">            String u = curr[0];</span>
-<span class="fc" id="L454">            int d = Integer.parseInt(curr[1]);</span>
+<span class="fc bfc" id="L472" title="All 2 branches covered.">        while (!pq.isEmpty()) {</span>
+<span class="fc" id="L473">            String[] curr = pq.poll();</span>
+<span class="fc" id="L474">            String u = curr[0];</span>
+<span class="fc" id="L475">            int d = Integer.parseInt(curr[1]);</span>
 
-<span class="pc bpc" id="L456" title="1 of 2 branches missed.">            if (visited.contains(u)) continue;</span>
-<span class="fc" id="L457">            visited.add(u);</span>
+<span class="fc bfc" id="L477" title="All 2 branches covered.">            if (visited.contains(u)) continue;</span>
+<span class="fc" id="L478">            visited.add(u);</span>
 
-<span class="fc bfc" id="L459" title="All 2 branches covered.">            if (u.equals(dst)) break;</span>
+<span class="fc bfc" id="L480" title="All 2 branches covered.">            if (u.equals(dst)) break;</span>
 
-<span class="fc" id="L461">            Map&lt;String, Integer&gt; neighbors = graph.get(u);</span>
-<span class="pc bpc" id="L462" title="1 of 2 branches missed.">            if (neighbors == null) continue;</span>
-<span class="fc bfc" id="L463" title="All 2 branches covered.">            for (Map.Entry&lt;String, Integer&gt; edge : neighbors.entrySet()) {</span>
-<span class="fc" id="L464">                String v = edge.getKey();</span>
-<span class="fc" id="L465">                int weight = edge.getValue();</span>
-<span class="fc" id="L466">                int newDist = d + weight;</span>
-<span class="fc bfc" id="L467" title="All 2 branches covered.">                if (newDist &lt; dist.getOrDefault(v, Integer.MAX_VALUE)) {</span>
-<span class="fc" id="L468">                    dist.put(v, newDist);</span>
-<span class="fc" id="L469">                    prev.put(v, u);</span>
-<span class="fc" id="L470">                    pq.offer(new String[]{v, String.valueOf(newDist)});</span>
+<span class="fc" id="L482">            Map&lt;String, Integer&gt; neighbors = graph.get(u);</span>
+<span class="fc bfc" id="L483" title="All 2 branches covered.">            for (Map.Entry&lt;String, Integer&gt; edge : neighbors.entrySet()) {</span>
+<span class="fc" id="L484">                String v = edge.getKey();</span>
+<span class="fc" id="L485">                int weight = edge.getValue();</span>
+<span class="fc" id="L486">                int newDist = d + weight;</span>
+<span class="fc bfc" id="L487" title="All 2 branches covered.">                if (newDist &lt; dist.getOrDefault(v, Integer.MAX_VALUE)) {</span>
+<span class="fc" id="L488">                    dist.put(v, newDist);</span>
+<span class="fc" id="L489">                    prev.put(v, u);</span>
+<span class="fc" id="L490">                    pq.offer(new String[]{v, String.valueOf(newDist)});</span>
                 }
-<span class="fc" id="L472">            }</span>
-<span class="fc" id="L473">        }</span>
+            }
+        }
 
-<span class="fc bfc" id="L475" title="All 2 branches covered.">        if (dist.getOrDefault(dst, Integer.MAX_VALUE) == Integer.MAX_VALUE) {</span>
-<span class="fc" id="L476">            return &quot;No path from \&quot;&quot; + word1 + &quot;\&quot; to \&quot;&quot; + word2 + &quot;\&quot;!&quot;;</span>
+<span class="fc bfc" id="L495" title="All 2 branches covered.">        if (dist.getOrDefault(dst, Integer.MAX_VALUE) == Integer.MAX_VALUE) {</span>
+<span class="fc" id="L496">            return &quot;No path from \&quot;&quot; + word1 + &quot;\&quot; to \&quot;&quot; + word2 + &quot;\&quot;!&quot;;</span>
         }
 
         // 回溯路径
-<span class="fc" id="L480">        List&lt;String&gt; path = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L481">        String current = dst;</span>
-<span class="fc bfc" id="L482" title="All 2 branches covered.">        while (current != null) {</span>
-<span class="fc" id="L483">            path.add(current);</span>
-<span class="fc" id="L484">            current = prev.get(current);</span>
+<span class="fc" id="L500">        List&lt;String&gt; path = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L501">        String current = dst;</span>
+<span class="fc bfc" id="L502" title="All 2 branches covered.">        while (current != null) {</span>
+<span class="fc" id="L503">            path.add(current);</span>
+<span class="fc" id="L504">            current = prev.get(current);</span>
         }
-<span class="fc" id="L486">        Collections.reverse(path);</span>
+<span class="fc" id="L506">        Collections.reverse(path);</span>
 
-<span class="fc" id="L488">        int length = dist.get(dst);</span>
-<span class="fc" id="L489">        String pathStr = String.join(&quot; -&gt; &quot;, path);</span>
+<span class="fc" id="L508">        int length = dist.get(dst);</span>
+<span class="fc" id="L509">        String pathStr = String.join(&quot; -&gt; &quot;, path);</span>
 
         // 生成高亮图
-<span class="pc bpc" id="L492" title="1 of 2 branches missed.">        if (enableGraphImage) {</span>
-<span class="fc" id="L493">            generatePathGraph(path);</span>
+<span class="fc bfc" id="L512" title="All 2 branches covered.">        if (enableGraphImage) {</span>
+<span class="fc" id="L513">            generatePathGraph(path);</span>
         }
-<span class="fc" id="L495">        return &quot;Shortest path: &quot; + pathStr + &quot; (length = &quot; + length + &quot;)&quot;;</span>
+<span class="fc" id="L515">        return &quot;Shortest path: &quot; + pathStr + &quot; (length = &quot; + length + &quot;)&quot;;</span>
+    }
+    /**
+ * 计算最短路径，返回路径节点列表
+ * 供单元测试使用
+ */
+    public static List&lt;String&gt; calcShortestPathList(String word1, String word2) {
+<span class="fc" id="L522">        String src = word1.toLowerCase();</span>
+<span class="fc" id="L523">        String dst = word2.toLowerCase();</span>
+
+<span class="pc bpc" id="L525" title="2 of 4 branches missed.">        if (!graph.containsKey(src) || !graph.containsKey(dst)) {</span>
+<span class="nc" id="L526">            return null;</span>
+        }
+
+<span class="fc" id="L529">        Map&lt;String, Integer&gt; dist = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L530">        Map&lt;String, String&gt; prev = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L531">        Set&lt;String&gt; visited = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L532">        PriorityQueue&lt;String[]&gt; pq = new PriorityQueue&lt;&gt;((a, b) -&gt;</span>
+<span class="fc" id="L533">            Integer.parseInt(a[1]) - Integer.parseInt(b[1]));</span>
+
+<span class="fc bfc" id="L535" title="All 2 branches covered.">        for (String node : graph.keySet()) {</span>
+<span class="fc" id="L536">            dist.put(node, Integer.MAX_VALUE);</span>
+        }
+<span class="fc" id="L538">        dist.put(src, 0);</span>
+<span class="fc" id="L539">        pq.offer(new String[]{src, &quot;0&quot;});</span>
+
+<span class="pc bpc" id="L541" title="1 of 2 branches missed.">        while (!pq.isEmpty()) {</span>
+<span class="fc" id="L542">            String[] curr = pq.poll();</span>
+<span class="fc" id="L543">            String u = curr[0];</span>
+<span class="fc" id="L544">            int d = Integer.parseInt(curr[1]);</span>
+
+<span class="pc bpc" id="L546" title="1 of 2 branches missed.">            if (visited.contains(u)) continue;</span>
+<span class="fc" id="L547">            visited.add(u);</span>
+<span class="fc bfc" id="L548" title="All 2 branches covered.">            if (u.equals(dst)) break;</span>
+
+<span class="fc" id="L550">            Map&lt;String, Integer&gt; neighbors = graph.get(u);</span>
+<span class="pc bpc" id="L551" title="1 of 2 branches missed.">            if (neighbors == null) continue;</span>
+<span class="fc bfc" id="L552" title="All 2 branches covered.">            for (Map.Entry&lt;String, Integer&gt; edge : neighbors.entrySet()) {</span>
+<span class="fc" id="L553">                String v = edge.getKey();</span>
+<span class="fc" id="L554">                int weight = edge.getValue();</span>
+<span class="fc" id="L555">                int newDist = d + weight;</span>
+<span class="fc bfc" id="L556" title="All 2 branches covered.">                if (newDist &lt; dist.getOrDefault(v, Integer.MAX_VALUE)) {</span>
+<span class="fc" id="L557">                    dist.put(v, newDist);</span>
+<span class="fc" id="L558">                    prev.put(v, u);</span>
+<span class="fc" id="L559">                    pq.offer(new String[]{v, String.valueOf(newDist)});</span>
+                }
+            }
+        }
+
+<span class="pc bpc" id="L564" title="1 of 2 branches missed.">        if (dist.getOrDefault(dst, Integer.MAX_VALUE) == Integer.MAX_VALUE) {</span>
+<span class="nc" id="L565">            return null;</span>
+        }
+
+<span class="fc" id="L568">        List&lt;String&gt; path = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L569">        String current = dst;</span>
+<span class="fc bfc" id="L570" title="All 2 branches covered.">        while (current != null) {</span>
+<span class="fc" id="L571">            path.add(current);</span>
+<span class="fc" id="L572">            current = prev.get(current);</span>
+        }
+<span class="fc" id="L574">        Collections.reverse(path);</span>
+<span class="fc" id="L575">        return path;</span>
     }
 
     /**
@@ -500,57 +580,57 @@ import java.util.*;
      */
     private static void generatePathGraph(List&lt;String&gt; path) {
         try {
-<span class="fc" id="L503">            Set&lt;String&gt; pathNodes = new HashSet&lt;&gt;(path);</span>
-<span class="fc" id="L504">            Set&lt;String&gt; pathEdges = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L505" title="All 2 branches covered.">            for (int i = 0; i &lt; path.size() - 1; i++) {</span>
-<span class="fc" id="L506">                pathEdges.add(path.get(i) + &quot;-&gt;&quot; + path.get(i + 1));</span>
+<span class="fc" id="L583">            Set&lt;String&gt; pathNodes = new HashSet&lt;&gt;(path);</span>
+<span class="fc" id="L584">            Set&lt;String&gt; pathEdges = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L585" title="All 2 branches covered.">            for (int i = 0; i &lt; path.size() - 1; i++) {</span>
+<span class="fc" id="L586">                pathEdges.add(path.get(i) + &quot;-&gt;&quot; + path.get(i + 1));</span>
             }
 
-<span class="fc" id="L509">            StringBuilder dot = new StringBuilder();</span>
-<span class="fc" id="L510">            dot.append(&quot;digraph WordGraph {\n&quot;);</span>
-<span class="fc" id="L511">            dot.append(&quot;  layout=neato;\n&quot;);</span>
-<span class="fc" id="L512">            dot.append(&quot;  overlap=false;\n&quot;);</span>
-<span class="fc" id="L513">            dot.append(&quot;  splines=true;\n&quot;);</span>
-<span class="fc" id="L514">            dot.append(&quot;  sep=\&quot;+5\&quot;;\n&quot;);</span>
-<span class="fc" id="L515">            dot.append(&quot;  node [shape=circle, style=filled, fillcolor=\&quot;#FFB6C1\&quot;,\n&quot;);</span>
-<span class="fc" id="L516">            dot.append(&quot;        fontsize=11, fontname=\&quot;Arial\&quot;, width=0.6, fixedsize=false];\n&quot;);</span>
-<span class="fc" id="L517">            dot.append(&quot;  edge [fontsize=9, fontname=\&quot;Arial\&quot;, color=\&quot;#2E8B57\&quot;,\n&quot;);</span>
-<span class="fc" id="L518">            dot.append(&quot;        fontcolor=\&quot;#333333\&quot;, arrowsize=0.7];\n&quot;);</span>
+<span class="fc" id="L589">            StringBuilder dot = new StringBuilder();</span>
+<span class="fc" id="L590">            dot.append(&quot;digraph WordGraph {\n&quot;);</span>
+<span class="fc" id="L591">            dot.append(&quot;  layout=neato;\n&quot;);</span>
+<span class="fc" id="L592">            dot.append(&quot;  overlap=false;\n&quot;);</span>
+<span class="fc" id="L593">            dot.append(&quot;  splines=true;\n&quot;);</span>
+<span class="fc" id="L594">            dot.append(&quot;  sep=\&quot;+5\&quot;;\n&quot;);</span>
+<span class="fc" id="L595">            dot.append(&quot;  node [shape=circle, style=filled, fillcolor=\&quot;#FFB6C1\&quot;,\n&quot;);</span>
+<span class="fc" id="L596">            dot.append(&quot;        fontsize=11, fontname=\&quot;Arial\&quot;, width=0.6, fixedsize=false];\n&quot;);</span>
+<span class="fc" id="L597">            dot.append(&quot;  edge [fontsize=9, fontname=\&quot;Arial\&quot;, color=\&quot;#2E8B57\&quot;,\n&quot;);</span>
+<span class="fc" id="L598">            dot.append(&quot;        fontcolor=\&quot;#333333\&quot;, arrowsize=0.7];\n&quot;);</span>
 
             // 高亮路径节点（黄色）
-<span class="fc bfc" id="L521" title="All 2 branches covered.">            for (String node : pathNodes) {</span>
-<span class="fc" id="L522">                dot.append(String.format(&quot;  \&quot;%s\&quot; [fillcolor=\&quot;#FFD700\&quot;];\n&quot;, node));</span>
-<span class="fc" id="L523">            }</span>
+<span class="fc bfc" id="L601" title="All 2 branches covered.">            for (String node : pathNodes) {</span>
+<span class="fc" id="L602">                dot.append(String.format(&quot;  \&quot;%s\&quot; [fillcolor=\&quot;#FFD700\&quot;];\n&quot;, node));</span>
+            }
 
-<span class="fc bfc" id="L525" title="All 2 branches covered.">            for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : graph.entrySet()) {</span>
-<span class="fc" id="L526">                String from = entry.getKey();</span>
-<span class="fc bfc" id="L527" title="All 2 branches covered.">                for (Map.Entry&lt;String, Integer&gt; edge : entry.getValue().entrySet()) {</span>
-<span class="fc" id="L528">                    String edgeKey = from + &quot;-&gt;&quot; + edge.getKey();</span>
-<span class="fc" id="L529">                    int w = edge.getValue();</span>
-<span class="fc bfc" id="L530" title="All 2 branches covered.">                    if (pathEdges.contains(edgeKey)) {</span>
-<span class="fc" id="L531">                        dot.append(String.format(&quot;  \&quot;%s\&quot; -&gt; \&quot;%s\&quot; [label=\&quot;%d\&quot;, color=\&quot;#FF0000\&quot;, penwidth=2.5, fontcolor=\&quot;#FF0000\&quot;];\n&quot;,</span>
-<span class="fc" id="L532">                            from, edge.getKey(), w));</span>
-                    } else {
-<span class="fc" id="L534">                        double penwidth = 1.0 + (w - 1) * 0.8;</span>
-<span class="fc" id="L535">                        dot.append(String.format(&quot;  \&quot;%s\&quot; -&gt; \&quot;%s\&quot; [label=\&quot;%d\&quot;, penwidth=%.1f];\n&quot;,</span>
-<span class="fc" id="L536">                            from, edge.getKey(), w, penwidth));</span>
+<span class="fc bfc" id="L605" title="All 2 branches covered.">            for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : graph.entrySet()) {</span>
+<span class="fc" id="L606">                String from = entry.getKey();</span>
+<span class="fc bfc" id="L607" title="All 2 branches covered.">                for (Map.Entry&lt;String, Integer&gt; edge : entry.getValue().entrySet()) {</span>
+<span class="fc" id="L608">                    String edgeKey = from + &quot;-&gt;&quot; + edge.getKey();</span>
+<span class="fc" id="L609">                    int w = edge.getValue();</span>
+<span class="fc bfc" id="L610" title="All 2 branches covered.">                    if (pathEdges.contains(edgeKey)) {</span>
+<span class="fc" id="L611">                        dot.append(String.format(&quot;  \&quot;%s\&quot; -&gt; \&quot;%s\&quot; [label=\&quot;%d\&quot;, color=\&quot;#FF0000\&quot;, penwidth=2.5, fontcolor=\&quot;#FF0000\&quot;];\n&quot;,</span>
+<span class="fc" id="L612">                            from, edge.getKey(), w));</span>
+<span class="fc" id="L613">                    } else {</span>
+<span class="fc" id="L614">                        double penwidth = 1.0 + (w - 1) * 0.8;</span>
+<span class="fc" id="L615">                        dot.append(String.format(&quot;  \&quot;%s\&quot; -&gt; \&quot;%s\&quot; [label=\&quot;%d\&quot;, penwidth=%.1f];\n&quot;,</span>
+<span class="fc" id="L616">                            from, edge.getKey(), w, penwidth));</span>
                     }
-<span class="fc" id="L538">                }</span>
-<span class="fc" id="L539">            }</span>
-<span class="fc" id="L540">            dot.append(&quot;}\n&quot;);</span>
+                }
+            }
+<span class="fc" id="L620">            dot.append(&quot;}\n&quot;);</span>
 
-<span class="fc" id="L542">            String dotFile = &quot;shortest_path.dot&quot;;</span>
-<span class="fc" id="L543">            String pngFile = &quot;shortest_path.png&quot;;</span>
-<span class="fc" id="L544">            BufferedWriter writer = new BufferedWriter(new FileWriter(dotFile));</span>
-<span class="fc" id="L545">            writer.write(dot.toString());</span>
-<span class="fc" id="L546">            writer.close();</span>
-<span class="fc" id="L547">            System.out.println(&quot;最短路径DOT文件已保存为 &quot; + dotFile);</span>
+<span class="fc" id="L622">            String dotFile = &quot;shortest_path.dot&quot;;</span>
+<span class="fc" id="L623">            String pngFile = &quot;shortest_path.png&quot;;</span>
+<span class="fc" id="L624">            BufferedWriter writer = new BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(dotFile), StandardCharsets.UTF_8));</span>
+<span class="fc" id="L625">            writer.write(dot.toString());</span>
+<span class="fc" id="L626">            writer.close();</span>
+<span class="fc" id="L627">            System.out.println(&quot;最短路径DOT文件已保存为 &quot; + dotFile);</span>
 
-<span class="fc" id="L549">            runDot(dotFile, pngFile);</span>
-<span class="nc" id="L550">        } catch (Exception e) {</span>
-<span class="nc" id="L551">            System.out.println(&quot;生成路径图时出错: &quot; + e.getMessage());</span>
-<span class="fc" id="L552">        }</span>
-<span class="fc" id="L553">    }</span>
+<span class="fc" id="L629">            runDot(dotFile, pngFile);</span>
+<span class="pc" id="L630">        } catch (Exception e) {</span>
+<span class="nc" id="L631">            System.out.println(&quot;生成路径图时出错: &quot; + e.getMessage());</span>
+        }
+<span class="fc" id="L633">    }</span>
 
     // ==================== 功能5：PageRank ====================
     /**
@@ -558,74 +638,74 @@ import java.util.*;
      * d = 0.85, 迭代直到收敛
      */
     public static Double calPageRank(String word) {
-<span class="nc" id="L561">        String w = word.toLowerCase();</span>
-<span class="nc bnc" id="L562" title="All 2 branches missed.">        if (!graph.containsKey(w)) {</span>
-<span class="nc" id="L563">            return null;</span>
+<span class="nc" id="L641">        String w = word.toLowerCase();</span>
+<span class="nc bnc" id="L642" title="All 2 branches missed.">        if (!graph.containsKey(w)) {</span>
+<span class="nc" id="L643">            return null;</span>
         }
 
-<span class="nc" id="L566">        double d = 0.85;</span>
-<span class="nc" id="L567">        int N = graph.size();</span>
-<span class="nc" id="L568">        int maxIter = 200;</span>
-<span class="nc" id="L569">        double epsilon = 1e-8;</span>
+<span class="nc" id="L646">        double d = 0.85;</span>
+<span class="nc" id="L647">        int N = graph.size();</span>
+<span class="nc" id="L648">        int maxIter = 200;</span>
+<span class="nc" id="L649">        double epsilon = 1e-8;</span>
 
         // 初始化PR值
-<span class="nc" id="L572">        Map&lt;String, Double&gt; pr = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L573" title="All 2 branches missed.">        for (String node : graph.keySet()) {</span>
-<span class="nc" id="L574">            pr.put(node, 1.0 / N);</span>
-<span class="nc" id="L575">        }</span>
+<span class="nc" id="L652">        Map&lt;String, Double&gt; pr = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L653" title="All 2 branches missed.">        for (String node : graph.keySet()) {</span>
+<span class="nc" id="L654">            pr.put(node, 1.0 / N);</span>
+        }
 
         // 预计算每个节点的出度
-<span class="nc" id="L578">        Map&lt;String, Integer&gt; outDegree = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L579">        List&lt;String&gt; danglingNodes = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L580" title="All 2 branches missed.">        for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : graph.entrySet()) {</span>
-<span class="nc" id="L581">            int deg = entry.getValue().size();</span>
-<span class="nc" id="L582">            outDegree.put(entry.getKey(), deg);</span>
-<span class="nc bnc" id="L583" title="All 2 branches missed.">            if (deg == 0) {</span>
-<span class="nc" id="L584">                danglingNodes.add(entry.getKey());</span>
-            }
-<span class="nc" id="L586">        }</span>
-
-        // 预计算每个节点的入边
-<span class="nc" id="L589">        Map&lt;String, List&lt;String&gt;&gt; inEdges = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L590" title="All 2 branches missed.">        for (String node : graph.keySet()) {</span>
-<span class="nc" id="L591">            inEdges.put(node, new ArrayList&lt;&gt;());</span>
-<span class="nc" id="L592">        }</span>
-<span class="nc bnc" id="L593" title="All 2 branches missed.">        for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : graph.entrySet()) {</span>
-<span class="nc" id="L594">            String from = entry.getKey();</span>
-<span class="nc bnc" id="L595" title="All 2 branches missed.">            for (String to : entry.getValue().keySet()) {</span>
-<span class="nc" id="L596">                inEdges.get(to).add(from);</span>
-<span class="nc" id="L597">            }</span>
-<span class="nc" id="L598">        }</span>
-
-        // 迭代计算
-<span class="nc bnc" id="L601" title="All 2 branches missed.">        for (int iter = 0; iter &lt; maxIter; iter++) {</span>
-<span class="nc" id="L602">            Map&lt;String, Double&gt; newPR = new HashMap&lt;&gt;();</span>
-
-            // 计算dangling节点的PR总和
-<span class="nc" id="L605">            double danglingSum = 0;</span>
-<span class="nc bnc" id="L606" title="All 2 branches missed.">            for (String dn : danglingNodes) {</span>
-<span class="nc" id="L607">                danglingSum += pr.get(dn);</span>
-<span class="nc" id="L608">            }</span>
-
-<span class="nc" id="L610">            double maxDiff = 0;</span>
-<span class="nc bnc" id="L611" title="All 2 branches missed.">            for (String node : graph.keySet()) {</span>
-<span class="nc" id="L612">                double sum = 0;</span>
-<span class="nc bnc" id="L613" title="All 2 branches missed.">                for (String inNode : inEdges.get(node)) {</span>
-<span class="nc" id="L614">                    sum += pr.get(inNode) / outDegree.get(inNode);</span>
-<span class="nc" id="L615">                }</span>
-                // 加上dangling节点均分的贡献
-<span class="nc" id="L617">                double newVal = (1.0 - d) / N + d * (sum + danglingSum / N);</span>
-<span class="nc" id="L618">                newPR.put(node, newVal);</span>
-<span class="nc" id="L619">                maxDiff = Math.max(maxDiff, Math.abs(newVal - pr.get(node)));</span>
-<span class="nc" id="L620">            }</span>
-
-<span class="nc" id="L622">            pr = newPR;</span>
-<span class="nc bnc" id="L623" title="All 2 branches missed.">            if (maxDiff &lt; epsilon) {</span>
-<span class="nc" id="L624">                break;</span>
+<span class="nc" id="L658">        Map&lt;String, Integer&gt; outDegree = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L659">        List&lt;String&gt; danglingNodes = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L660" title="All 2 branches missed.">        for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : graph.entrySet()) {</span>
+<span class="nc" id="L661">            int deg = entry.getValue().size();</span>
+<span class="nc" id="L662">            outDegree.put(entry.getKey(), deg);</span>
+<span class="nc bnc" id="L663" title="All 2 branches missed.">            if (deg == 0) {</span>
+<span class="nc" id="L664">                danglingNodes.add(entry.getKey());</span>
             }
         }
 
-<span class="nc" id="L628">        return pr.get(w);</span>
+        // 预计算每个节点的入边
+<span class="nc" id="L669">        Map&lt;String, List&lt;String&gt;&gt; inEdges = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L670" title="All 2 branches missed.">        for (String node : graph.keySet()) {</span>
+<span class="nc" id="L671">            inEdges.put(node, new ArrayList&lt;&gt;());</span>
+        }
+<span class="nc bnc" id="L673" title="All 2 branches missed.">        for (Map.Entry&lt;String, Map&lt;String, Integer&gt;&gt; entry : graph.entrySet()) {</span>
+<span class="nc" id="L674">            String from = entry.getKey();</span>
+<span class="nc bnc" id="L675" title="All 2 branches missed.">            for (String to : entry.getValue().keySet()) {</span>
+<span class="nc" id="L676">                inEdges.get(to).add(from);</span>
+            }
+        }
+
+        // 迭代计算
+<span class="nc bnc" id="L681" title="All 2 branches missed.">        for (int iter = 0; iter &lt; maxIter; iter++) {</span>
+<span class="nc" id="L682">            Map&lt;String, Double&gt; newPR = new HashMap&lt;&gt;();</span>
+
+            // 计算dangling节点的PR总和
+<span class="nc" id="L685">            double danglingSum = 0;</span>
+<span class="nc bnc" id="L686" title="All 2 branches missed.">            for (String dn : danglingNodes) {</span>
+<span class="nc" id="L687">                danglingSum += pr.get(dn);</span>
+            }
+
+<span class="nc" id="L690">            double maxDiff = 0;</span>
+<span class="nc bnc" id="L691" title="All 2 branches missed.">            for (String node : graph.keySet()) {</span>
+<span class="nc" id="L692">                double sum = 0;</span>
+<span class="nc bnc" id="L693" title="All 2 branches missed.">                for (String inNode : inEdges.get(node)) {</span>
+<span class="nc" id="L694">                    sum += pr.get(inNode) / outDegree.get(inNode);</span>
+                }
+                // 加上dangling节点均分的贡献
+<span class="nc" id="L697">                double newVal = (1.0 - d) / N + d * (sum + danglingSum / N);</span>
+<span class="nc" id="L698">                newPR.put(node, newVal);</span>
+<span class="nc" id="L699">                maxDiff = Math.max(maxDiff, Math.abs(newVal - pr.get(node)));</span>
+            }
+
+<span class="nc" id="L702">            pr = newPR;</span>
+<span class="nc bnc" id="L703" title="All 2 branches missed.">            if (maxDiff &lt; epsilon) {</span>
+<span class="nc" id="L704">                break;</span>
+            }
+        }
+
+<span class="nc" id="L708">        return pr.get(w);</span>
     }
 
     // ==================== 功能6：随机游走 ====================
@@ -634,29 +714,29 @@ import java.util.*;
      * 返回null表示游走结束（重复边或无出边）
      * 首次调用时初始化，后续调用继续游走
      */
-<span class="fc" id="L637">    private static String walkCurrent = null;</span>
-<span class="fc" id="L638">    private static List&lt;String&gt; walkVisitedNodes = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L639">    private static Set&lt;String&gt; walkVisitedEdges = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L640">    private static boolean walkFinished = false;</span>
-<span class="fc" id="L641">    private static String walkStopReason = &quot;&quot;;</span>
+<span class="fc" id="L717">    private static String walkCurrent = null;</span>
+<span class="fc" id="L718">    private static List&lt;String&gt; walkVisitedNodes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L719">    private static Set&lt;String&gt; walkVisitedEdges = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L720">    private static boolean walkFinished = false;</span>
+<span class="fc" id="L721">    private static String walkStopReason = &quot;&quot;;</span>
 
     /**
      * 初始化随机游走，返回起始节点
      */
     public static String randomWalkInit() {
-<span class="nc bnc" id="L647" title="All 2 branches missed.">        if (graph.isEmpty()) {</span>
-<span class="nc" id="L648">            walkFinished = true;</span>
-<span class="nc" id="L649">            walkStopReason = &quot;图为空！&quot;;</span>
-<span class="nc" id="L650">            return null;</span>
+<span class="nc bnc" id="L727" title="All 2 branches missed.">        if (graph.isEmpty()) {</span>
+<span class="nc" id="L728">            walkFinished = true;</span>
+<span class="nc" id="L729">            walkStopReason = &quot;图为空！&quot;;</span>
+<span class="nc" id="L730">            return null;</span>
         }
-<span class="nc" id="L652">        List&lt;String&gt; nodeList = new ArrayList&lt;&gt;(graph.keySet());</span>
-<span class="nc" id="L653">        walkCurrent = nodeList.get(random.nextInt(nodeList.size()));</span>
-<span class="nc" id="L654">        walkVisitedNodes.clear();</span>
-<span class="nc" id="L655">        walkVisitedEdges.clear();</span>
-<span class="nc" id="L656">        walkFinished = false;</span>
-<span class="nc" id="L657">        walkStopReason = &quot;&quot;;</span>
-<span class="nc" id="L658">        walkVisitedNodes.add(walkCurrent);</span>
-<span class="nc" id="L659">        return walkCurrent;</span>
+<span class="nc" id="L732">        List&lt;String&gt; nodeList = new ArrayList&lt;&gt;(graph.keySet());</span>
+<span class="nc" id="L733">        walkCurrent = nodeList.get(random.nextInt(nodeList.size()));</span>
+<span class="nc" id="L734">        walkVisitedNodes.clear();</span>
+<span class="nc" id="L735">        walkVisitedEdges.clear();</span>
+<span class="nc" id="L736">        walkFinished = false;</span>
+<span class="nc" id="L737">        walkStopReason = &quot;&quot;;</span>
+<span class="nc" id="L738">        walkVisitedNodes.add(walkCurrent);</span>
+<span class="nc" id="L739">        return walkCurrent;</span>
     }
 
     /**
@@ -664,30 +744,30 @@ import java.util.*;
      * 如果游走结束返回null，停止原因存在walkStopReason中
      */
     public static String randomWalkStep() {
-<span class="nc bnc" id="L667" title="All 4 branches missed.">        if (walkFinished || walkCurrent == null) return null;</span>
+<span class="nc bnc" id="L747" title="All 4 branches missed.">        if (walkFinished || walkCurrent == null) return null;</span>
 
-<span class="nc" id="L669">        Map&lt;String, Integer&gt; neighbors = graph.get(walkCurrent);</span>
-<span class="nc bnc" id="L670" title="All 4 branches missed.">        if (neighbors == null || neighbors.isEmpty()) {</span>
-<span class="nc" id="L671">            walkFinished = true;</span>
-<span class="nc" id="L672">            walkStopReason = &quot;节点 \&quot;&quot; + walkCurrent + &quot;\&quot; 无出边，游走结束&quot;;</span>
-<span class="nc" id="L673">            return null;</span>
+<span class="nc" id="L749">        Map&lt;String, Integer&gt; neighbors = graph.get(walkCurrent);</span>
+<span class="nc bnc" id="L750" title="All 4 branches missed.">        if (neighbors == null || neighbors.isEmpty()) {</span>
+<span class="nc" id="L751">            walkFinished = true;</span>
+<span class="nc" id="L752">            walkStopReason = &quot;节点 \&quot;&quot; + walkCurrent + &quot;\&quot; 无出边，游走结束&quot;;</span>
+<span class="nc" id="L753">            return null;</span>
         }
 
-<span class="nc" id="L676">        List&lt;String&gt; neighborList = new ArrayList&lt;&gt;(neighbors.keySet());</span>
-<span class="nc" id="L677">        String next = neighborList.get(random.nextInt(neighborList.size()));</span>
-<span class="nc" id="L678">        String edge = walkCurrent + &quot; -&gt; &quot; + next;</span>
+<span class="nc" id="L756">        List&lt;String&gt; neighborList = new ArrayList&lt;&gt;(neighbors.keySet());</span>
+<span class="nc" id="L757">        String next = neighborList.get(random.nextInt(neighborList.size()));</span>
+<span class="nc" id="L758">        String edge = walkCurrent + &quot; -&gt; &quot; + next;</span>
 
-<span class="nc bnc" id="L680" title="All 2 branches missed.">        if (walkVisitedEdges.contains(edge)) {</span>
-<span class="nc" id="L681">            walkVisitedNodes.add(next);</span>
-<span class="nc" id="L682">            walkFinished = true;</span>
-<span class="nc" id="L683">            walkStopReason = &quot;边 \&quot;&quot; + edge + &quot;\&quot; 重复，游走结束&quot;;</span>
-<span class="nc" id="L684">            return next;</span>
+<span class="nc bnc" id="L760" title="All 2 branches missed.">        if (walkVisitedEdges.contains(edge)) {</span>
+<span class="nc" id="L761">            walkVisitedNodes.add(next);</span>
+<span class="nc" id="L762">            walkFinished = true;</span>
+<span class="nc" id="L763">            walkStopReason = &quot;边 \&quot;&quot; + edge + &quot;\&quot; 重复，游走结束&quot;;</span>
+<span class="nc" id="L764">            return next;</span>
         }
 
-<span class="nc" id="L687">        walkVisitedEdges.add(edge);</span>
-<span class="nc" id="L688">        walkVisitedNodes.add(next);</span>
-<span class="nc" id="L689">        walkCurrent = next;</span>
-<span class="nc" id="L690">        return next;</span>
+<span class="nc" id="L767">        walkVisitedEdges.add(edge);</span>
+<span class="nc" id="L768">        walkVisitedNodes.add(next);</span>
+<span class="nc" id="L769">        walkCurrent = next;</span>
+<span class="nc" id="L770">        return next;</span>
     }
 
     /**
@@ -696,31 +776,52 @@ import java.util.*;
      * 同时更新walkVisitedNodes供后续查询。
      */
     public static String randomWalk() {
-<span class="nc bnc" id="L699" title="All 2 branches missed.">        if (graph.isEmpty()) {</span>
-<span class="nc" id="L700">            return &quot;&quot;;</span>
+<span class="nc bnc" id="L779" title="All 2 branches missed.">        if (graph.isEmpty()) {</span>
+<span class="nc" id="L780">            return &quot;&quot;;</span>
         }
         // 若当前游走状态为空（未通过init/step调用），则执行完整游走
-<span class="nc bnc" id="L703" title="All 2 branches missed.">        if (walkVisitedNodes.isEmpty()) {</span>
-<span class="nc" id="L704">            randomWalkInit();</span>
-<span class="nc bnc" id="L705" title="All 2 branches missed.">            while (!walkFinished) {</span>
-<span class="nc" id="L706">                randomWalkStep();</span>
+<span class="nc bnc" id="L783" title="All 2 branches missed.">        if (walkVisitedNodes.isEmpty()) {</span>
+<span class="nc" id="L784">            randomWalkInit();</span>
+<span class="nc bnc" id="L785" title="All 2 branches missed.">            while (!walkFinished) {</span>
+<span class="nc" id="L786">                randomWalkStep();</span>
             }
         }
-<span class="nc" id="L709">        String result = String.join(&quot; &quot;, walkVisitedNodes);</span>
+<span class="nc" id="L789">        String result = String.join(&quot; &quot;, walkVisitedNodes);</span>
         try {
-<span class="nc" id="L711">            BufferedWriter writer = new BufferedWriter(new FileWriter(&quot;random_walk.txt&quot;));</span>
-<span class="nc" id="L712">            writer.write(result);</span>
-<span class="nc" id="L713">            writer.close();</span>
-<span class="nc" id="L714">        } catch (IOException e) {</span>
+<span class="nc" id="L791">            BufferedWriter writer = new BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(&quot;random_walk.txt&quot;), StandardCharsets.UTF_8));</span>
+<span class="nc" id="L792">            writer.write(result);</span>
+<span class="nc" id="L793">            writer.close();</span>
+<span class="nc" id="L794">        } catch (IOException e) {</span>
             // 写入失败时静默处理，由main输出错误信息
-<span class="nc" id="L716">        }</span>
-<span class="nc" id="L717">        return result;</span>
+        }
+<span class="nc" id="L797">        return result;</span>
     }
 
-<span class="nc" id="L720">    public static boolean isWalkFinished() { return walkFinished; }</span>
-<span class="nc" id="L721">    public static String getWalkStopReason() { return walkStopReason; }</span>
+    /**
+     * 游走是否已结束。
+     *
+     * @return 游走结束则返回true
+     */
+    public static boolean isWalkFinished() {
+<span class="nc" id="L806">        return walkFinished;</span>
+    }
+
+    /**
+     * 获取游走停止原因。
+     *
+     * @return 停止原因字符串
+     */
+    public static String getWalkStopReason() {
+<span class="nc" id="L815">        return walkStopReason;</span>
+    }
+
+    /**
+     * 仅供单元测试使用：替换图结构。
+     *
+     * @param testGraph 测试用图
+     */
     public static void setGraphForTest(Map&lt;String, Map&lt;String, Integer&gt;&gt; testGraph) {
-<span class="fc" id="L723">    graph = testGraph;</span>
-<span class="fc" id="L724">    }</span>
+<span class="fc" id="L824">        graph = new LinkedHashMap&lt;&gt;(testGraph);</span>
+<span class="fc" id="L825">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

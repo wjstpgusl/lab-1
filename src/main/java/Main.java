@@ -1,12 +1,26 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.Set;
 
 
 /**
  * Lab1: 基于大模型的编程与Git实战
  * 有向词图（Directed Word Graph）程序
- * 
- * 功能：
+ *
+ * <p>功能：
  * 1. 读入文本文件生成有向图
  * 2. 展示有向图
  * 3. 查询桥接词
@@ -26,11 +40,15 @@ public class Main {
     // 图的邻接表表示: word -> {neighbor -> weight}
     private static Map<String, Map<String, Integer>> graph = new LinkedHashMap<>();
     private static Random random = new Random();
-    private static boolean enableGraphImage = true;
+    static boolean enableGraphImage = true;
 
-    // ==================== 主程序 ====================
+    /**
+     * 程序入口：读取文件路径，构建词图，进入功能菜单循环。
+     *
+     * @param args 命令行参数，args[0]可指定文本文件路径
+     */
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8.name())) {
         String filePath;
 
         if (args.length > 0) {
@@ -148,19 +166,19 @@ public class Main {
                     break;
                 case "0":
                     System.out.println("程序退出。");
-                    scanner.close();
                     return;
                 default:
                     System.out.println("无效选择，请重新输入。");
             }
         }
+        } // end try-with-resources (scanner)
     }
 
     // ==================== 构建图 ====================
     private static boolean buildGraph(String filePath) {
         try {
             StringBuilder sb = new StringBuilder();
-            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new java.io.FileInputStream(filePath), StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
                 sb.append(line).append(" ");
@@ -257,7 +275,7 @@ public class Main {
             // 写DOT文件
             String dotFile = "graph.dot";
             String pngFile = "graph.png";
-            BufferedWriter writer = new BufferedWriter(new FileWriter(dotFile));
+            BufferedWriter writer = new BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(dotFile), StandardCharsets.UTF_8));
             writer.write(dot.toString());
             writer.close();
             System.out.println("DOT文件已保存为 " + dotFile);
@@ -277,7 +295,7 @@ public class Main {
     private static void runDot(String dotFile, String pngFile) {
         // 检测DOT文件中指定的layout引擎
         String engine = "dot";
-        try (BufferedReader check = new BufferedReader(new FileReader(dotFile))) {
+        try (BufferedReader check = new BufferedReader(new InputStreamReader(new java.io.FileInputStream(dotFile), StandardCharsets.UTF_8))) {
             String line;
             while ((line = check.readLine()) != null) {
                 if (line.contains("layout=neato")) { engine = "neato"; break; }
@@ -291,8 +309,12 @@ public class Main {
             ProcessBuilder pb = new ProcessBuilder(engine, "-Tpng", dotFile, "-o", pngFile);
             pb.redirectErrorStream(true);
             Process p = pb.start();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-                while (br.readLine() != null) { /* consume */ }
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8))) {
+                String outputLine;
+                while ((outputLine = br.readLine()) != null) {
+                    // consume process output
+                    assert outputLine != null;
+                }
             }
             int exitCode = p.waitFor();
             if (exitCode == 0) {
@@ -334,13 +356,12 @@ public class Main {
 
         // 查找桥接词
         List<String> bridgeWords = new ArrayList<>();
-        Map<String, Integer> w1Neighbors = graph.get(w1);
-        if (w1Neighbors != null) {
-            for (String mid : w1Neighbors.keySet()) {
-                Map<String, Integer> midNeighbors = graph.get(mid);
-                if (midNeighbors != null && midNeighbors.containsKey(w2)) {
-                    bridgeWords.add(mid);
-                }
+        Map<String, Integer> w1Neighbors = graph.getOrDefault(w1, Collections.emptyMap());
+        for (String mid : w1Neighbors.keySet()) {
+            // midNeighbors는 getOrDefault로 안전하게 처리
+            Map<String, Integer> midNeighbors = graph.getOrDefault(mid, Collections.emptyMap());
+            if (midNeighbors.containsKey(w2)) {
+                bridgeWords.add(mid);
             }
         }
 
@@ -440,7 +461,7 @@ public class Main {
         Map<String, String> prev = new HashMap<>();
         Set<String> visited = new HashSet<>();
         PriorityQueue<String[]> pq = new PriorityQueue<>((a, b) -> 
-            Integer.parseInt(a[1]) - Integer.parseInt(b[1]));
+            Integer.compare(Integer.parseInt(a[1]), Integer.parseInt(b[1])));
 
         for (String node : graph.keySet()) {
             dist.put(node, Integer.MAX_VALUE);
@@ -459,7 +480,6 @@ public class Main {
             if (u.equals(dst)) break;
 
             Map<String, Integer> neighbors = graph.get(u);
-            if (neighbors == null) continue;
             for (Map.Entry<String, Integer> edge : neighbors.entrySet()) {
                 String v = edge.getKey();
                 int weight = edge.getValue();
@@ -493,6 +513,66 @@ public class Main {
             generatePathGraph(path);
         }
         return "Shortest path: " + pathStr + " (length = " + length + ")";
+    }
+    /**
+ * 计算最短路径，返回路径节点列表
+ * 供单元测试使用
+ */
+    public static List<String> calcShortestPathList(String word1, String word2) {
+        String src = word1.toLowerCase();
+        String dst = word2.toLowerCase();
+
+        if (!graph.containsKey(src) || !graph.containsKey(dst)) {
+            return null;
+        }
+
+        Map<String, Integer> dist = new HashMap<>();
+        Map<String, String> prev = new HashMap<>();
+        Set<String> visited = new HashSet<>();
+        PriorityQueue<String[]> pq = new PriorityQueue<>((a, b) ->
+            Integer.parseInt(a[1]) - Integer.parseInt(b[1]));
+
+        for (String node : graph.keySet()) {
+            dist.put(node, Integer.MAX_VALUE);
+        }
+        dist.put(src, 0);
+        pq.offer(new String[]{src, "0"});
+
+        while (!pq.isEmpty()) {
+            String[] curr = pq.poll();
+            String u = curr[0];
+            int d = Integer.parseInt(curr[1]);
+
+            if (visited.contains(u)) continue;
+            visited.add(u);
+            if (u.equals(dst)) break;
+
+            Map<String, Integer> neighbors = graph.get(u);
+            if (neighbors == null) continue;
+            for (Map.Entry<String, Integer> edge : neighbors.entrySet()) {
+                String v = edge.getKey();
+                int weight = edge.getValue();
+                int newDist = d + weight;
+                if (newDist < dist.getOrDefault(v, Integer.MAX_VALUE)) {
+                    dist.put(v, newDist);
+                    prev.put(v, u);
+                    pq.offer(new String[]{v, String.valueOf(newDist)});
+                }
+            }
+        }
+
+        if (dist.getOrDefault(dst, Integer.MAX_VALUE) == Integer.MAX_VALUE) {
+            return null;
+        }
+
+        List<String> path = new ArrayList<>();
+        String current = dst;
+        while (current != null) {
+            path.add(current);
+            current = prev.get(current);
+        }
+        Collections.reverse(path);
+        return path;
     }
 
     /**
@@ -541,7 +621,7 @@ public class Main {
 
             String dotFile = "shortest_path.dot";
             String pngFile = "shortest_path.png";
-            BufferedWriter writer = new BufferedWriter(new FileWriter(dotFile));
+            BufferedWriter writer = new BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(dotFile), StandardCharsets.UTF_8));
             writer.write(dot.toString());
             writer.close();
             System.out.println("最短路径DOT文件已保存为 " + dotFile);
@@ -708,7 +788,7 @@ public class Main {
         }
         String result = String.join(" ", walkVisitedNodes);
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("random_walk.txt"));
+            BufferedWriter writer = new BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream("random_walk.txt"), StandardCharsets.UTF_8));
             writer.write(result);
             writer.close();
         } catch (IOException e) {
@@ -717,9 +797,30 @@ public class Main {
         return result;
     }
 
-    public static boolean isWalkFinished() { return walkFinished; }
-    public static String getWalkStopReason() { return walkStopReason; }
+    /**
+     * 游走是否已结束。
+     *
+     * @return 游走结束则返回true
+     */
+    public static boolean isWalkFinished() {
+        return walkFinished;
+    }
+
+    /**
+     * 获取游走停止原因。
+     *
+     * @return 停止原因字符串
+     */
+    public static String getWalkStopReason() {
+        return walkStopReason;
+    }
+
+    /**
+     * 仅供单元测试使用：替换图结构。
+     *
+     * @param testGraph 测试用图
+     */
     public static void setGraphForTest(Map<String, Map<String, Integer>> testGraph) {
-    graph = testGraph;
+        graph = new LinkedHashMap<>(testGraph);
     }
 }

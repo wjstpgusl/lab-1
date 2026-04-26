@@ -7,14 +7,11 @@ digraph WordGraph {
         fontsize=11, fontname="Arial", width=0.6, fixedsize=false];
   edge [fontsize=9, fontname="Arial", color="#2E8B57",
         fontcolor="#333333", arrowsize=0.7];
-  "new" [fillcolor="#FFD700"];
-  "worlds" [fillcolor="#FFD700"];
-  "explore" [fillcolor="#FFD700"];
-  "to" [fillcolor="#FFD700"];
-  "to" -> "explore" [label="1", color="#FF0000", penwidth=2.5, fontcolor="#FF0000"];
-  "to" -> "seek" [label="1", penwidth=1.0];
-  "explore" -> "new" [label="1", color="#FF0000", penwidth=2.5, fontcolor="#FF0000"];
-  "explore" -> "strange" [label="1", penwidth=1.0];
-  "seek" -> "new" [label="1", penwidth=1.0];
-  "new" -> "worlds" [label="1", color="#FF0000", penwidth=2.5, fontcolor="#FF0000"];
+  "b" [fillcolor="#FFD700"];
+  "dst" [fillcolor="#FFD700"];
+  "src" [fillcolor="#FFD700"];
+  "src" -> "a" [label="10", penwidth=8.2];
+  "src" -> "b" [label="2", color="#FF0000", penwidth=2.5, fontcolor="#FF0000"];
+  "b" -> "a" [label="1", penwidth=1.0];
+  "b" -> "dst" [label="100", color="#FF0000", penwidth=2.5, fontcolor="#FF0000"];
 }
